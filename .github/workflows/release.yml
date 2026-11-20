@@ -18,8 +18,8 @@ jobs:
   windows:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
       - name: Version
@@ -38,7 +38,7 @@ jobs:
           Get-ChildItem publish/EnbNext -Recurse -Filter *.pdb | Remove-Item
           Copy-Item LICENSE, THIRD_PARTY_NOTICES.md, README.md publish/EnbNext
           Compress-Archive -Path publish/EnbNext -DestinationPath "EnbNext-${{ steps.version.outputs.value }}-win-x64.zip"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: windows
           path: EnbNext-*-win-x64.zip
@@ -46,8 +46,8 @@ jobs:
   linux:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
       - name: Version
@@ -61,7 +61,7 @@ jobs:
           cp LICENSE THIRD_PARTY_NOTICES.md README.md publish/EnbNext/
           chmod 755 publish/EnbNext/EnbNext publish/EnbNext/cef/EnbNext.CefHelper
           tar -C publish -czf "EnbNext-${{ steps.version.outputs.value }}-linux-x64.tar.gz" EnbNext
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: linux
           path: EnbNext-*-linux-x64.tar.gz
@@ -71,7 +71,7 @@ jobs:
     needs: [windows, linux]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v6
         with:
           merge-multiple: true
       - name: Release
