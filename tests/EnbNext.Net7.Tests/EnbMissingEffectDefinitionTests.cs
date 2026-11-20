@@ -16,7 +16,7 @@ public sealed class EnbMissingEffectDefinitionTests
         new(10,1,1,2,definition,0,0,"",0,true,1,default,0,0,false,default,1,
             EnbSceneEffectGeometryKind.ObjectToObject,default,-1,default,0,0,null);
 
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(524)]
     [InlineData(20151)]
     [InlineData(20369)]
@@ -35,7 +35,7 @@ public sealed class EnbMissingEffectDefinitionTests
         scheduler.Update([],catalog,101);Assert.Equal(0,scheduler.TrackedRootCount);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void MissingSoundNextLinkKeepsAuthoredFirstTwoVoicesWithoutSubstitution()
     {
         var catalog=Installed();var root=Root(10140);
@@ -49,7 +49,7 @@ public sealed class EnbMissingEffectDefinitionTests
         Assert.DoesNotContain("E10143",scheduler.LifecycleHistory);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void MissingSplineStartLinkPreservesFourDefinedSiblings()
     {
         var catalog=Installed();var root=Root(556);

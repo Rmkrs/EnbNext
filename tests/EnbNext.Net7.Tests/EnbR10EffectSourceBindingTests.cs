@@ -30,7 +30,7 @@ public sealed class EnbR10EffectSourceBindingTests
         binding.Update([],[]);Assert.Equal(0,binding.Count);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void InstalledSeek10158TracksItsOriginalSourceAndRetainsItAfterLoss()
     {
         var assets=EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);

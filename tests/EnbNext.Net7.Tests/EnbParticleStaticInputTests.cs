@@ -8,7 +8,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbParticleStaticInputTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(0u)]
     [InlineData(1u)]
     public void ZeroFrameAtlasIsRetainedWhileGeometryChangesAndQueuedViewsSurviveResize(uint mode)

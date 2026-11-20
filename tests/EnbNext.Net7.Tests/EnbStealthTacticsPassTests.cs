@@ -7,7 +7,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbStealthTacticsPassTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(328)]
     [InlineData(329)]
     [InlineData(677)]
@@ -28,7 +28,7 @@ public sealed class EnbStealthTacticsPassTests
         (definition with {ResetMappers=false}).ValidateSwatch(pass);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void InstalledStealthCancellationEndsZeroCycleLinkAndKeepsRestorationCycle()
     {
         var paths=EnbInstalledAssetLocator.TryLocate();Assert.NotNull(paths);
@@ -49,7 +49,7 @@ public sealed class EnbStealthTacticsPassTests
         Assert.Contains(" E677 NextLink duration 0ms cancel True",scheduler.LifecycleHistory);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void DirectExitKeepsAuthoredHiddenSecondBeforeRestoration()
     {
         var paths=EnbInstalledAssetLocator.TryLocate();Assert.NotNull(paths);

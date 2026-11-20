@@ -6,7 +6,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbAnalyzeWeaknessRecoveryTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(211)]
     [InlineData(10247)]
     public void AbsentInactiveSecondTextureRecoversOnlyProvenFirstStage(int id)

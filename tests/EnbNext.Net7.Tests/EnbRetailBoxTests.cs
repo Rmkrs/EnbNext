@@ -7,7 +7,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbRetailBoxTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(0u)] [InlineData(1u)]
     public void AggregateBoxCreatesChildrenWithoutRetainingThem(uint attributes)
     {
@@ -34,7 +34,7 @@ public sealed class EnbRetailBoxTests
         finally {File.Delete(file);}
     }
 
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(0u)]
     [InlineData(1u)]
     public void EffectSelectsOnlyTheNamedBoxPrototype(uint attributes)
@@ -52,7 +52,7 @@ public sealed class EnbRetailBoxTests
         Assert.Equal(Assert.Single(model.Boxes).Extents,box.Extents);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void BoxEffectCannotBorrowItsContainingHlodAnimation()
     {
         var assets=EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);

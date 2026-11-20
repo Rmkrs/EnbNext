@@ -7,7 +7,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class Net7ItemTemplateWireTests
 {
-    [Fact]
+    [InstalledRetailFact]
     public void PinnedCurrentCDataAll5530RecordsDecodeAndRoundTripByteExact()
     {
         Net7CDataCatalog catalog = Net7LocalDataAssets.CurrentCData;
@@ -25,7 +25,7 @@ public sealed class Net7ItemTemplateWireTests
         Assert.Equal(5_530, decoded);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void RepresentativeCurrentRecordsPreserveMixedEndianStringsAttributesAndNestedVectors()
     {
         Net7CDataCatalog catalog = Net7LocalDataAssets.CurrentCData;

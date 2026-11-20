@@ -38,7 +38,7 @@ public sealed class EnbRingFactoryScaleTests
         Assert.Equal(Vector2.Zero,drawn.Values.SecondRadii);
     }
 
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(false)] [InlineData(true)]
     public void PrepareOnlyPrimitiveWrapperConstructsChildrenWithoutRetainingThem(bool sphere)
     {

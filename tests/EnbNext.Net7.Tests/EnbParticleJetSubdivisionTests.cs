@@ -6,7 +6,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbParticleJetSubdivisionTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(2167)]
     [InlineData(2168)]
     [InlineData(2148)]

@@ -8,7 +8,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbStationInteriorTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(false,false)]
     [InlineData(true,false)]
     [InlineData(true,true)]

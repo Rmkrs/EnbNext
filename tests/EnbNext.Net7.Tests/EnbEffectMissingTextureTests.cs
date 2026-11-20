@@ -6,7 +6,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbEffectMissingTextureTests
 {
-    [Fact]
+    [InstalledRetailFact]
     public void UnusedLoadedMissingTextureRemainsPreparedAcrossHsvAndLaterNamedPublication()
     {
         var assets=EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);
@@ -31,7 +31,7 @@ public sealed class EnbEffectMissingTextureTests
         Assert.Contains(recolored.Meshes.SelectMany(mesh=>mesh.CurrentRetailLoadedTextureResources),texture=>ReferenceEquals(texture,retained));
     }
 
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(228, "MISSILE.TGA")]
     [InlineData(0, "rvc02_detail02.tga")]
     public void NamedMissingMeshTextureKeepsSourceFailureAndUnchangedFallbackUnderHsv(int id,string missing)
@@ -71,7 +71,7 @@ public sealed class EnbEffectMissingTextureTests
         Assert.Same(unsupported,assets.Textures.ResolveCurrentRetailMissingMeshTexture(nonTexture,assets.Paths.ClientExecutablePath));
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void OrdinaryMissingAdmissionPreservesUnsupportedDecoderAndExplicitUnboundStages()
     {
         var assets=EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);

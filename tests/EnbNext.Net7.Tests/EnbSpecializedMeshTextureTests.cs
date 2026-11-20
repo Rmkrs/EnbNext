@@ -6,7 +6,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbSpecializedMeshTextureTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(false)] [InlineData(true)]
     public void PrimitiveMeshParentPreservesExplicitUnboundStages(bool sphere)
     {
@@ -22,7 +22,7 @@ public sealed class EnbSpecializedMeshTextureTests
         Assert.NotEmpty(bindings);Assert.All(bindings,b=>Assert.True(b.IsUnbound));
     }
 
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData("ring",1877)] [InlineData("sphere",1877)]
     [InlineData("plume",1850)] [InlineData("tunnel",216)]
     public void NamedMissingMeshTextureUsesRetailImageWithoutDroppingChildren(string kind,int baseId)

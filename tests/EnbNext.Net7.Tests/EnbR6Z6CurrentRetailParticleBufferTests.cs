@@ -11,7 +11,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbR6Z6CurrentRetailParticleBufferTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(false)] [InlineData(true)]
     public void OrdinaryHlodEmitterDoesNotRequireAPackageTexture(bool empty)
     {

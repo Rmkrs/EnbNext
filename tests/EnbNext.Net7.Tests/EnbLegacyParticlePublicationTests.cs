@@ -7,7 +7,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbLegacyParticlePublicationTests
 {
-    [Fact]
+    [InstalledRetailFact]
     public async Task EarlierMissingHlodMemberIsNotResurrectedByLaterFilePublication()
     {
         var assets=EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);
@@ -53,7 +53,7 @@ public sealed class EnbLegacyParticlePublicationTests
         BinaryPrimitives.WriteSingleLittleEndian(pivot.AsSpan(56),1);
         return Chunk(0x100,[..Chunk(0x101,header),..Chunk(0x102,pivot)]);
     }
-    [Fact]
+    [InstalledRetailFact]
     public async Task RetainedModelChildBuildUsesPreparedDescendantsAfterFilesAndProviderDisappear()
     {
         var assets=EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);
@@ -86,7 +86,7 @@ public sealed class EnbLegacyParticlePublicationTests
         finally{Directory.Delete(directory,true);}
     }
 
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(false,0)] [InlineData(true,0)]
     [InlineData(false,1)] [InlineData(true,1)]
     [InlineData(false,2)] [InlineData(true,2)]
@@ -161,7 +161,7 @@ public sealed class EnbLegacyParticlePublicationTests
         {byte[] node=new byte[36];Encoding.ASCII.GetBytes(member).CopyTo(node,4);return Chunk(0x704,node);})])]);
     }
 
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(1)] [InlineData(2)] [InlineData(3)]
     public void ReadableWrongNameMemberPreservesFileEffectsAndNativeContinuation(int kind)
     {
@@ -223,7 +223,7 @@ public sealed class EnbLegacyParticlePublicationTests
         finally{Directory.Delete(directory,true);}
     }
 
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(false)] [InlineData(true)]
     public void ConfiguredFactoryPublishesAuthoredFileOnceBeforeSelectionAndBuild(bool missingName)
     {
@@ -342,7 +342,7 @@ public sealed class EnbLegacyParticlePublicationTests
         Assert.False(cache.TryFindPrototypeSource("LEGACY743",out _));
     }
 
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(false)] [InlineData(true)]
     public void MeshAndLegacyAcquisitionsFollowFileRootOrder(bool meshFirst)
     {

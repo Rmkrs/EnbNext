@@ -6,7 +6,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbBoundBurstTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(20)]
     [InlineData(25)]
     public void BurstRetainsEachBirthAndClampsFinalAllowance(int allowance)

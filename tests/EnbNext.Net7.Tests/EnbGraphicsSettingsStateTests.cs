@@ -8,7 +8,7 @@ namespace EnbNext.Net7.Tests;
 public sealed class EnbGraphicsSettingsStateTests
 {
     private static EnbGraphicsSettingsState Create() => new(EnbRenderSession.Of(EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!)).SliderPanels);
-    [Fact]
+    [InstalledRetailFact]
     public void ActualDraftPreservesMissingInputDefaultsAndFractionalValues()
     {
         var state=Create();var values=state.Sliders;
@@ -25,7 +25,7 @@ public sealed class EnbGraphicsSettingsStateTests
         state.Retire(null,null);Assert.Equal(EnbScrollbarPart.None,slider.Pressed);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void AllFiveSlidersClampAndRoundTripRetailEndpoints()
     {
         var state=Create();
@@ -42,7 +42,7 @@ public sealed class EnbGraphicsSettingsStateTests
         }
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void FailedApplyRetainsDraftAndRetryCommitsInOrder()
     {
         var state=Create();state.Load(new(false),EnbRetailRenderBudgetSourceSettings.RetailExecutableDefaults);state.BeginPreview();
@@ -55,7 +55,7 @@ public sealed class EnbGraphicsSettingsStateTests
         Assert.False(state.TryApply(_=>throw new Exception("retired"),null,null));
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void RetirementRestoresDisplayEvenWhenPreviewRemovalFails()
     {
         var state=Create();state.Load(new(false),EnbRetailRenderBudgetSourceSettings.RetailExecutableDefaults);state.BeginPreview();
@@ -68,7 +68,7 @@ public sealed class EnbGraphicsSettingsStateTests
         state.Preview(_=>throw new Exception("retired"));
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void MonitorRefreshRetainsCustomCurrentSelectionWithoutApplyingIt()
     {
         var state=Create();
@@ -82,7 +82,7 @@ public sealed class EnbGraphicsSettingsStateTests
         Assert.Null(state.PreviewDisplay(2,c=>Assert.Equal(native,c)));Assert.Equal(2,state.DisplayChoiceIndex);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void DisplayCallbacksPreserveSelectionOnFailureAndOpeningOnlyFallback()
     {
         var state=Create();var calls=new List<string>();

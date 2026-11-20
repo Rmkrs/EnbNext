@@ -7,7 +7,7 @@ namespace EnbNext.Net7.Tests;
 [Collection(LoadSensitiveCollection.Name)]
 public sealed class EnbHorizontalSliderVisualTests
 {
-    [Fact]
+    [InstalledRetailFact]
     public void ResizingOneRowPreservesOtherRowsAndTheSharedSource()
     {
         var paths = EnbInstalledAssetLocator.TryLocate(); Assert.NotNull(paths);
@@ -29,7 +29,7 @@ public sealed class EnbHorizontalSliderVisualTests
         first.Resize(16); Assert.Same(original, first.Asset); Assert.Equal(originalBounds, first.Bounds);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void MinimumAndUnchangedLengthsRetainGeometryWithoutAllocating()
     {
         var paths = EnbInstalledAssetLocator.TryLocate(); Assert.NotNull(paths);

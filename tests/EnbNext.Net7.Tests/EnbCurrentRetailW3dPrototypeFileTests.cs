@@ -30,7 +30,7 @@ public sealed class EnbCurrentRetailW3dPrototypeFileTests
         Assert.Empty(file.Model.Meshes);
     }
 
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(false)]
     [InlineData(true)]
     public void MixedFilePreservesOrdinaryAndAggregateDuplicatePublicationOrder(bool aggregateFirst)
@@ -56,7 +56,7 @@ public sealed class EnbCurrentRetailW3dPrototypeFileTests
         Assert.Equal(!aggregateFirst,registered.RegisteredPrototype?.Kind==EnbW3dPrototypeKind.HierarchyModel);
     }
 
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(false)]
     [InlineData(true)]
     public void RegisteredAggregateCreatesTheCurrentBaseWithoutReopeningItsFile(bool cycle)

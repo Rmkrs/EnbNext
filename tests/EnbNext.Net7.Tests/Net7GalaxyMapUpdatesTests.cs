@@ -119,7 +119,7 @@ public sealed class Net7GalaxyMapUpdatesTests
         Assert.Equal(new byte[] { 5 }, next.AuxiliaryBlob);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void PersistedWholeMapFlagIsIndependentOfRecordPresenceAndKnownBits()
     {
         Assert.False(EnbRetailPlayerOptionsCatalog.ParseText("").GalaxyMapShowAll);
@@ -132,7 +132,7 @@ public sealed class Net7GalaxyMapUpdatesTests
         Assert.Equal(1,wholeReply[^1]);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void CommandThreeReplacesKnownBitsWithoutRemovingRecordsOrChangingPresenceReply()
     {
         var map = Net7LocalDataAssets.CurrentGalaxyMap;
@@ -167,7 +167,7 @@ public sealed class Net7GalaxyMapUpdatesTests
         Assert.Equal(EnbGalaxyMapPresentation.SectorColor(map,a),EnbGalaxyMapPresentation.LinkColor(map,b with { Field2=200 },a));
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void RemovingAParentSuppressesItsSectorPresentationsWithoutDeletingSourceChildren()
     {
         var map = Net7LocalDataAssets.CurrentGalaxyMap;
@@ -178,7 +178,7 @@ public sealed class Net7GalaxyMapUpdatesTests
         Assert.Equal(map.Systems.Count-1,next.Systems.Count);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void MissingParentAndUnsupportedSubtypeHaveNoInventedPresentation()
     {
         var map=Net7LocalDataAssets.CurrentGalaxyMap;
@@ -191,7 +191,7 @@ public sealed class Net7GalaxyMapUpdatesTests
         Assert.Equal(map.Systems,Net7GalaxyMapUpdates.Apply(map,Packet(2,[0xFF,0xFF,0xFF])).Systems);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void LoginReplayRestoresLocalBitsAndMissingRecordsButPreservesSuppliedNamesAndExtraRecords()
     {
         var asset=Net7LocalDataAssets.CurrentGalaxyMap;

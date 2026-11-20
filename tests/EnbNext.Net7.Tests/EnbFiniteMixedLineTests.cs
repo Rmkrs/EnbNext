@@ -6,7 +6,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbFiniteMixedLineTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(0f)]
     [InlineData(120f)]
     public void InstalledAssemblyRetainsFiniteLineWithoutReplacingSiblingRuntimes(float hue)
@@ -47,7 +47,7 @@ public sealed class EnbFiniteMixedLineTests
         Assert.Null(mixed.RecoveryDiagnostic);
     }
 
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(0f)]
     [InlineData(120f)]
     public void RiftShockwaveRetainsMergedLightningAllowanceAndSphereSiblings(float hue)

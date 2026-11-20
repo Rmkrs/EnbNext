@@ -6,7 +6,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbParticleJetFiniteLineTests
 {
-    [Fact]
+    [InstalledRetailFact]
     public void InstalledFizzleExhaustsOneFourParticleBurstWithoutDroppingEndpointOrRestarting()
     {
         var paths=EnbInstalledAssetLocator.TryLocate();Assert.NotNull(paths);

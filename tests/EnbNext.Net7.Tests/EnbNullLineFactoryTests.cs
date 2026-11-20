@@ -5,7 +5,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbNullLineFactoryTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData("root")]
     [InlineData("StartLinkID")]
     [InlineData("NextLinkID")]
@@ -35,7 +35,7 @@ public sealed class EnbNullLineFactoryTests
         Assert.Equal(1,constructions);Assert.Equal(placement=="NextLinkID"?100u:0u,constructionTick);
         scheduler.Update([],catalog,2001,lineFactoryRejection:Construct);Assert.Equal(0,scheduler.TrackedRootCount);
     }
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData("StartLinkID")]
     [InlineData("NextLinkID")]
     public void WrongClassLinkedNodeIsRejectedWithoutRejectingValidNullParent(string link)
@@ -52,7 +52,7 @@ public sealed class EnbNullLineFactoryTests
         scheduler.Update([],catalog,1001);Assert.Equal(0,scheduler.TrackedRootCount);
     }
 
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(696)]
     [InlineData(1178)]
     public void InstalledWrongClassRootNeverStartsItsLinkedVisualOrSound(ushort definition)

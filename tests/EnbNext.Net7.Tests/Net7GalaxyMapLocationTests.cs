@@ -8,7 +8,7 @@ public sealed class Net7GalaxyMapLocationTests
 {
     public const string Captured = "040000001F000000BBA301005369726975730053776F6F70696E67204561676C65000077010000";
 
-    [Fact]
+    [InstalledRetailFact]
     public void CapturedLocationHasSeparateChannelAndRecordCount()
     {
         var location = Net7GalaxyMapLocationWire.Decode(Convert.FromHexString(Captured));
@@ -64,7 +64,7 @@ public sealed class Net7GalaxyMapLocationTests
         Assert.Single(Net7GalaxyMapUpdates.Apply(resized, remove).Gates);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void TruncationsAreRejectedAndOversizedCountsSendNoReply()
     {
         byte[] packet = Convert.FromHexString(Captured);

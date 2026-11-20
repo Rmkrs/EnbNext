@@ -6,7 +6,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbEffectProxyMetadataTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData("ring")]
     [InlineData("sphere")]
     [InlineData("attachment")]

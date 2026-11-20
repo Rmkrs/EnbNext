@@ -9,7 +9,7 @@ namespace EnbNext.Net7.Tests;
 [Collection(LoadSensitiveCollection.Name)]
 public sealed class EnbInformationPanelTests
 {
-    [Fact]
+    [InstalledRetailFact]
     public void PreparedPanelsAreSessionOwnedAndViewsRetireTheirOwnLabelsAndGadgets()
     {
         var assets=EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);
@@ -37,7 +37,7 @@ public sealed class EnbInformationPanelTests
         Assert.NotSame(session.Information,EnbRenderSession.Of(second).Information);
         Assert.NotSame(session.Information.Get("log"),EnbRenderSession.Of(second).Information.Get("log"));
     }
-    [Fact]
+    [InstalledRetailFact]
     public void EachPanelOwnsItsActorAndBrowserRetentionPreservesOnlyHelp()
     {
         var assets=EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);
@@ -57,7 +57,7 @@ public sealed class EnbInformationPanelTests
         Assert.NotSame(session.Information.HelpAvatar,EnbRenderSession.Of(other).Information.HelpAvatar);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public async Task RetiringUiReleasesOwnedEditorsAndInvalidatesItsPendingTransaction()
     {
         var assets=EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);
@@ -80,7 +80,7 @@ public sealed class EnbInformationPanelTests
         Assert.Equal(0,completed);Assert.Equal(2u,replacement.Petition.Category);Assert.Equal("new draft",replacement.Body.Text);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void FormActionsRetainDraftOnNoAndApplyBackOnlyOnAcceptedCancellation()
     {
         var assets=EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);var session=EnbRenderSession.Of(assets);
@@ -100,7 +100,7 @@ public sealed class EnbInformationPanelTests
         Assert.False(ui.ImportPlayer(null));Assert.Equal("",ui.Player.Text);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public async Task CommandsPreserveSoundBeforeEditorMutationAndExcludeModalOrPendingActions()
     {
         var assets=EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);var session=EnbRenderSession.Of(assets);
@@ -126,7 +126,7 @@ public sealed class EnbInformationPanelTests
         ui.RetireForm();transport.SetResult(true);Assert.Equal(EnbPetitionSendResult.Ignored,await pending);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void SharedCollectionPreservesQueuedInputAcrossPanelsAndRetiresAttachedModalGraph()
     {
         var assets=EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);var session=EnbRenderSession.Of(assets);

@@ -6,7 +6,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbInlineEffectAttachmentTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(false)]
     [InlineData(true)]
     public void PermanentMeshAndParticleChildrenKeepSeparateConsumers(bool withProxy)
@@ -29,7 +29,7 @@ public sealed class EnbInlineEffectAttachmentTests
         Assert.Equal(mesh.TriangleMetadata.Count*mesh.CurrentRetailRenderPassCount+mixed.EmitterFixedCost,combined);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void EmptyInlineAggregateRetainsOrdinaryMeshRoot()
     {
         var assets=EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);
@@ -62,7 +62,7 @@ public sealed class EnbInlineEffectAttachmentTests
         Assert.Empty(asset.ModelAttachments);Assert.Null(asset.AggregateParticles);
     }
 
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(1,1)]
     [InlineData(32,1)]
     [InlineData(33,1)]
@@ -88,7 +88,7 @@ public sealed class EnbInlineEffectAttachmentTests
         Assert.All(runtime.Sprites,s=>{Assert.True(s.Continuous!.EmittedCount>0);Assert.NotEmpty(s.Continuous.Births);});
     }
 
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(2010,4,5,"SHLD_DRNFXP1")]
     [InlineData(1946,2,4,"TSG01P1_DECO")]
     public void InstalledInlineChildKeepsMeshesPivotAndContinuousBirths(int id,int meshes,int pivot,string name)

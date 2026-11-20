@@ -9,7 +9,7 @@ namespace EnbNext.Net7.Tests;
 [Collection(LoadSensitiveCollection.Name)]
 public sealed class EnbUtilityNativeInputTests
 {
-    [Fact]
+    [InstalledRetailFact]
     public void AuthoredUtilityQueriesPreserveMasksCaptureAndTooltipOnlyBars()
     {
         var assets = EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);

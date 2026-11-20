@@ -20,7 +20,7 @@ public sealed class EnbControlsPanelStateTests
         panel.Begin(draft); return panel;
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void SaveFailureRetainsDraftAndRetryRetiresIt()
     {
         using var panel = Create(out var draft, out _);
@@ -34,7 +34,7 @@ public sealed class EnbControlsPanelStateTests
         Assert.True(saved.UpdateError); Assert.Null(saved.Error); Assert.Null(panel.Draft); Assert.Empty(panel.Rows);
     }
 
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData("control/BUTTON03", 1)]
     [InlineData("control/EXIT", 2)]
     public void CancelAndExitRetireWithoutSaving(string command, int navigation)
@@ -47,7 +47,7 @@ public sealed class EnbControlsPanelStateTests
         Assert.Empty(panel.Rows); Assert.Equal(EnbScrollbarPart.None, panel.ScrollInput.Pressed);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void CategoryAndPresetUseRetainedRowsAndNativeCueOrder()
     {
         using var panel = Create(out _, out _);
@@ -60,7 +60,7 @@ public sealed class EnbControlsPanelStateTests
         Assert.All(panel.Rows, row => Assert.Equal("Activation", row.Context)); Assert.NotSame(rows, panel.Rows);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void ModalBlocksCommandsUntilAnswerAndRetirementClearsTransaction()
     {
         using var panel = Create(out var draft, out var dialog);

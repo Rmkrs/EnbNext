@@ -7,7 +7,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbW3dDazzlePrototypeAdmissionTests
 {
-    [Fact]
+    [InstalledRetailFact]
     public void AggregateDazzlePublishesChildrenWithoutRetainingTheirModels()
     {
         var assets=EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);

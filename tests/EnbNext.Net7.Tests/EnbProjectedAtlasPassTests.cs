@@ -7,7 +7,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbProjectedAtlasPassTests
 {
-    [Fact]
+    [InstalledRetailFact]
     public void GenericSkillGraphHasIndependentObjectAndSurfaceLifetimes()
     {
         var paths=EnbInstalledAssetLocator.TryLocate();Assert.NotNull(paths);

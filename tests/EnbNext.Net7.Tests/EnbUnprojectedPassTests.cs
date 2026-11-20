@@ -7,7 +7,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbUnprojectedPassTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(338)]
     [InlineData(340)]
     [InlineData(342)]

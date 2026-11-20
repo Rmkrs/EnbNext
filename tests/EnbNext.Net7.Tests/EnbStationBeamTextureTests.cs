@@ -7,7 +7,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbStationBeamTextureTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData("av_tele01",false)] [InlineData("av_tele01",true)]
     [InlineData("av_tele02",false)] [InlineData("av_tele02",true)]
     [InlineData("av_tele03",false)] [InlineData("av_tele03",true)]

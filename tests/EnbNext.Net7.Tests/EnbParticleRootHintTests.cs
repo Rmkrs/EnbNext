@@ -6,7 +6,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbParticleRootHintTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData("ms02a-pat.w3d")]
     [InlineData("ms03a-pat.w3d")]
     public void InstalledUnhintedParticleRootDecodesWithoutWeakeningPayloadBounds(string name)

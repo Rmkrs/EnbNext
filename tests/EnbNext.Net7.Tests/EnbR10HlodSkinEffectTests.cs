@@ -7,7 +7,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbR10HlodSkinEffectTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(1191)] [InlineData(1155)]
     public void DirectSkinAttachmentUsesParentHierarchyInsteadOfMountTransform(int id)
     {
@@ -31,7 +31,7 @@ public sealed class EnbR10HlodSkinEffectTests
         }
     }
 
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(1191,false)] [InlineData(1191,true)]
     [InlineData(1155,false)] [InlineData(1155,true)]
     public void HmodelOwnedInfluencesUseTheSameBoneTransformsAsHlod(int id,bool skinConnection)

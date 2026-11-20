@@ -7,7 +7,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbParticleJetCrystalTests
 {
-    [Fact]
+    [InstalledRetailFact]
     public void InstalledCrystalBurstsRetainVelocityFollowLocalPoseAndDrain()
     {
         var paths=EnbInstalledAssetLocator.TryLocate(); Assert.NotNull(paths);

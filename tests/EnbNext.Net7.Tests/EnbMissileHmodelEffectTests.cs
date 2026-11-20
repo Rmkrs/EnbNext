@@ -7,7 +7,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbMissileHmodelEffectTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(130,false)] [InlineData(130,true)] [InlineData(230,false)] [InlineData(230,true)]
     public void HmodelLineAttachmentRetainsAnimatedEndpointAndWorldBirths(int baseId,bool next)
     {
@@ -37,7 +37,7 @@ public sealed class EnbMissileHmodelEffectTests
         Assert.Equal(Draw(false).Mesh.Positions.Count+2,Draw(true).Mesh.Positions.Count);
     }
 
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(130,false)] [InlineData(130,true)] [InlineData(230,false)] [InlineData(230,true)]
     public void HmodelStreakAndSpriteSiblingsFollowObservedParent(int baseId,bool next)
     {
@@ -72,7 +72,7 @@ public sealed class EnbMissileHmodelEffectTests
         }
     }
 
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(false)] [InlineData(true)]
     public void ExplicitAnimationMovesHmodelMeshAndAttachedParticlePivot(bool next)
     {
@@ -93,7 +93,7 @@ public sealed class EnbMissileHmodelEffectTests
         Assert.Equal(next?0:1,Assert.Single(asset.Sample(0,500,observed)).Frame);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void Ms03KeepsStaticModelAndSeparateAuthoredParticlePivot()
     {
         var assets=EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);

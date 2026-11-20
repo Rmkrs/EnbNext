@@ -9,7 +9,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbRObjNamedLeafChildTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData("V_DECEPT01A.OBJECT015")]
     [InlineData("SK_AFBURN01A.DAZZLE")]
     [InlineData("NAMED_EMPTY.EMPTY")]

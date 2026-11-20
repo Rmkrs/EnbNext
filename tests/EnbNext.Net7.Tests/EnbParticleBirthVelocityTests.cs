@@ -7,7 +7,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbParticleBirthVelocityTests
 {
-    [Fact]
+    [InstalledRetailFact]
     public void InstalledCygniJetIsFiniteLocalSpaceAndRetainsItsBirthVelocity()
     {
         var paths=EnbInstalledAssetLocator.TryLocate(); Assert.NotNull(paths);
@@ -48,7 +48,7 @@ public sealed class EnbParticleBirthVelocityTests
         Assert.Empty(state.WorldBirths);
     }
 
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(0)]
     [InlineData(90)]
     public void ChangedEmitterVelocityLeavesOlderParticlesAndStoppedTailUnchanged(float yaw)

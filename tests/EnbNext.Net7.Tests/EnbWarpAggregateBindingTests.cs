@@ -6,7 +6,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbWarpAggregateBindingTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(0,false)] [InlineData(0,true)]
     [InlineData(710,false)] [InlineData(710,true)]
     [InlineData(674,false)] [InlineData(674,true)]
@@ -69,7 +69,7 @@ public sealed class EnbWarpAggregateBindingTests
         finally {Directory.Delete(directory,true);}
     }
 
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(0)] [InlineData(710)] [InlineData(674)]
     public void UnrequestedLibraryClipDoesNotChangeWarpPose(int effectId)
     {
@@ -86,7 +86,7 @@ public sealed class EnbWarpAggregateBindingTests
         if(tree.Pivots.Count>1)Assert.True(Vector3.Distance(pose[1].Translation,animated.WorldTransforms[1].Translation)>10000);
     }
 
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(0,false)] [InlineData(0,true)]
     [InlineData(710,false)] [InlineData(710,true)]
     [InlineData(674,false)] [InlineData(674,true)]

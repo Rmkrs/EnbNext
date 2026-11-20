@@ -7,7 +7,7 @@ namespace EnbNext.Net7.Tests;
 [Collection(LoadSensitiveCollection.Name)]
 public sealed class EnbVerticalScrollbarVisualTests
 {
-    [Fact]
+    [InstalledRetailFact]
     public void InstalledThumbRetainsUnchangedGeometryAndDoesNotMutateAnotherSlider()
     {
         var paths = EnbInstalledAssetLocator.TryLocate(); Assert.NotNull(paths);
@@ -32,7 +32,7 @@ public sealed class EnbVerticalScrollbarVisualTests
         controls.Resize(79.75); Assert.Same(retained, controls.Thumb);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void SizesBelowNativeMinimumUseAnimationFrameZero()
     {
         var paths = EnbInstalledAssetLocator.TryLocate(); Assert.NotNull(paths);

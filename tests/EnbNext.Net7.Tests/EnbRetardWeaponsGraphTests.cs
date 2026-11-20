@@ -6,7 +6,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbRetardWeaponsGraphTests
 {
-    [Fact]
+    [InstalledRetailFact]
     public void InstalledChainKeepsDelayedRootAndThreeTargetPassPhases()
     {
         var paths=EnbInstalledAssetLocator.TryLocate();Assert.NotNull(paths);

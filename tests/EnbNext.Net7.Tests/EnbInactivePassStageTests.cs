@@ -7,7 +7,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbInactivePassStageTests
 {
-    [Fact]
+    [InstalledRetailFact]
     public void InstalledRallySurfaceKeepsSharedClockWithDisabledSecondStage()
     {
         var paths=EnbInstalledAssetLocator.TryLocate();Assert.NotNull(paths);

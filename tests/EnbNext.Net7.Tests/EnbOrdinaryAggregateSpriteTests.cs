@@ -7,7 +7,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbOrdinaryAggregateSpriteTests
 {
-    [Fact]
+    [InstalledRetailFact]
     public void InstalledAtmosphereSpriteRetainsBirthGeometryAndDetachedTail()
     {
         var assets=EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);

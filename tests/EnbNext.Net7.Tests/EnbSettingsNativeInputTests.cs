@@ -8,7 +8,7 @@ namespace EnbNext.Net7.Tests;
 [Collection(LoadSensitiveCollection.Name)]
 public sealed class EnbSettingsNativeInputTests
 {
-    [Fact]
+    [InstalledRetailFact]
     public void NavigationCheckboxDependencyPreservesDraftAndCancelDoesNotSave()
     {
         var assets=EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);
@@ -27,7 +27,7 @@ public sealed class EnbSettingsNativeInputTests
         Click(0);Assert.False(state.RoutePlanner);Click(1);Assert.True(state.Check);
         state.Retire();state.Begin(123,7,1280,720,true,EnbSettingsState.NavigationSection);Assert.False(state.RoutePlanner);Assert.False(state.Check);state.Retire();
     }
-    [Fact]
+    [InstalledRetailFact]
     public void NativeSettingsCaptureRepeatModifiersAndMovableBounds()
     {
         var assets=EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);

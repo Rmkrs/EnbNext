@@ -32,7 +32,7 @@ public sealed class WaypointCommandTests
     [InlineData("\"Mars Alpha 1 2")]
     public void RejectsIncompleteArguments(string arguments) => Assert.NotNull(EnbWayCommand.Parse(arguments).Error);
 
-    [Fact]
+    [InstalledRetailFact]
     public void ClearAndCurrentSectorAndNamedSectorDriveTheSingleWaypoint()
     {
         Assert.True(EnbWayCommand.Parse("clear").Clear);

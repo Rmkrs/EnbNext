@@ -6,7 +6,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbSneakyPassTests
 {
-    [Fact]
+    [InstalledRetailFact]
     public void InstalledSneakyDelayAndFloatDurationBoundaries()
     {
         var paths=EnbInstalledAssetLocator.TryLocate();Assert.NotNull(paths);
@@ -28,7 +28,7 @@ public sealed class EnbSneakyPassTests
         scheduler.Update([],catalog,4400);Assert.Equal(0,scheduler.TrackedRootCount);
     }
 
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(625)]
     [InlineData(626)]
     [InlineData(627)]

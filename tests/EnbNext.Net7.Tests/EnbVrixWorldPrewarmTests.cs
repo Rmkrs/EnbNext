@@ -6,7 +6,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbVrixWorldPrewarmTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData("v-j_proj01_p4",500,20)]
     [InlineData("v-j_miss01_p1",250,12)]
     public void InstalledPrewarmKeepsNegativeBirthsAndFiniteMovingPoses(string name,int initial,int interval)

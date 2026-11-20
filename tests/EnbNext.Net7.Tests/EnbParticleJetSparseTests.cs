@@ -6,7 +6,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbParticleJetSparseTests
 {
-    [Fact]
+    [InstalledRetailFact]
     public void InstalledVrixInitialOffsetAdvancesBirthWithoutChangingIntervalOrLifetime()
     {
         var paths=EnbInstalledAssetLocator.TryLocate();Assert.NotNull(paths);

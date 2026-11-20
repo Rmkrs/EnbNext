@@ -19,7 +19,7 @@ public sealed class EnbParticleJetLifetimeTests
     public void SelectionPreservesMinimumBranchAndStrictTolerance(float original,float current,float minimum,float velocity,float distance,float expected)
         => Assert.Equal(expected,EnbCurrentRetailParticleJetLifetime.Select(original,current,minimum,velocity,distance),6);
 
-    [Fact]
+    [InstalledRetailFact]
     public void RetimingCopiesAllSixTimelinesWithoutChangingValuesOrAuthoredDefinition()
     {
         var paths=EnbInstalledAssetLocator.TryLocate(); Assert.NotNull(paths);

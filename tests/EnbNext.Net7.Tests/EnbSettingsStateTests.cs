@@ -13,7 +13,7 @@ public sealed class EnbSettingsStateTests
         return EnbRetailAssetBundle.Load(paths);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void NextOptionsPreviewLiveAndCancelRestoresTheOpeningValues()
     {
         string directory=Path.Combine(Path.GetTempPath(),"settings-"+Guid.NewGuid().ToString("N"));
@@ -39,7 +39,7 @@ public sealed class EnbSettingsStateTests
         finally {if(Directory.Exists(directory))Directory.Delete(directory,true);}
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void NavigationSaveRetainsDisabledAutoPilotAndCancelRestoresSavedChoices()
     {
         string directory=Path.Combine(Path.GetTempPath(),"settings-"+Guid.NewGuid().ToString("N"));
@@ -55,7 +55,7 @@ public sealed class EnbSettingsStateTests
         }
         finally {if(Directory.Exists(directory))Directory.Delete(directory,true);}
     }
-    [Fact]
+    [InstalledRetailFact]
     public void SoundPreviewRetiresForItsOriginalCharacterAndSaveFailureCanRetry()
     {
         var assets = Assets(); var original = assets.ResolvePlayerOptions(123).Options;
@@ -78,7 +78,7 @@ public sealed class EnbSettingsStateTests
         Assert.Equal(value,(float)state.Sliders[0].Value);Assert.False(state.TrySave(_=>throw new Exception("retired"),null,null));
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void FontDraftPreservesFractionalValuesIndependentOfCueNotches()
     {
         var assets=Assets();var state=new EnbSettingsState(assets,f=>EnbRetailFontFactory.TryCreate(assets,f,out var face)?face.CellHeight:null);
@@ -98,7 +98,7 @@ public sealed class EnbSettingsStateTests
         foreach(var font in original)Assert.Equal(font,assets.ResolveChatFont(123,profile,font));
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void MissingOptionalFontKeepsThePreviouslyResolvedDefinition()
     {
         var assets=Assets();var state=new EnbSettingsState(assets,_=>null);
@@ -108,7 +108,7 @@ public sealed class EnbSettingsStateTests
         state.Retire();Assert.Empty(state.Fonts);Assert.Null(state.Profile);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void PreparedFontMetricsMatchDecodedFacesAndReuseAuthoredSlots()
     {
         var assets=Assets();var session=EnbNext.Rendering.EnbRenderSession.Of(assets);var metrics=session.SettingsFontMetrics;
@@ -132,7 +132,7 @@ public sealed class EnbSettingsStateTests
         Assert.Equal(0,allocated);
         Assert.Null(metrics.Height(new(0,null,"missing-settings-font-fixture.tga",1,0)));
     }
-    [Fact]
+    [InstalledRetailFact]
     public void SettingsReadActualSliderValuesAndRetirementCancelsEveryCapture()
     {
         var assets=Assets();var state=new EnbSettingsState(assets);

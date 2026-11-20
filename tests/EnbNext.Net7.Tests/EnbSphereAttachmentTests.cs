@@ -6,7 +6,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbSphereAttachmentTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(false,false)] [InlineData(true,false)] [InlineData(false,true)] [InlineData(true,true)]
     public void MultilevelMeshParentRetainsUnscaledPrimitiveConstructionBounds(bool includeRings,bool forceChild)
     {
@@ -34,7 +34,7 @@ public sealed class EnbSphereAttachmentTests
         Assert.InRange(System.Numerics.Vector3.Distance(maximum,bounds.LocalBox.Center+bounds.LocalBox.Extents),0,.001f);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void MeshParentRetainsSphereAndEveryRingSibling()
     {
         var assets=EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);
@@ -48,7 +48,7 @@ public sealed class EnbSphereAttachmentTests
         Assert.Null(loaded.Mixed);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void SphereAndRingAssemblyRetainsPreparedNextAnimation()
     {
         var assets=EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);

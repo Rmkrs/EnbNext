@@ -5,7 +5,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbStationMachineryClockTests
 {
-    [Fact]
+    [InstalledRetailFact]
     public void MissingAnimationKeepsTheAuthoredModelWithoutAnAnimationSample()
     {
         var assets=EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);
@@ -17,7 +17,7 @@ public sealed class EnbStationMachineryClockTests
         machine.StartPlayback(10000);
         Assert.Null(machine.Sample(10000));Assert.Null(machine.Sample(20000));
     }
-    [Fact]
+    [InstalledRetailFact]
     public void LoopRetainsFrameAndUsesRetailSingleWrapAfterAbsence()
     {
         var assets=EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);

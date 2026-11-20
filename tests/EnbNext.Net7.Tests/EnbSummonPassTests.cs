@@ -6,7 +6,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbSummonPassTests
 {
-    [Fact]
+    [InstalledRetailFact]
     public void SummonGraphHasDelayedFlashAndTwoHiddenPhases()
     {
         var paths=EnbInstalledAssetLocator.TryLocate();Assert.NotNull(paths);

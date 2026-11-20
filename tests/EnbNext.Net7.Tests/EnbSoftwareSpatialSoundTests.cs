@@ -7,7 +7,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbSoftwareSpatialSoundTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData("1077_Gate_War_Hulk",5000f,1000f)]
     [InlineData("1115_Aganju",950000f,100000f)]
     public void AuthoredReversedRadiiAreSubmittedWithoutInventedOrderingRejection(string name,float full,float drop)

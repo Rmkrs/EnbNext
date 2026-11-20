@@ -12,7 +12,7 @@ public sealed class Net7AssetDirectAuditTests
     private const int GalaxyMapFrames = 305;
     private const string GalaxyMapSha256 = "3F2441D7DE271ABF0F3E9D0732E0BE7BEBB4E1F35760A69233219D4F21E98B42";
 
-    [Fact]
+    [InstalledRetailFact]
     public void Asset02GalaxyMapPinnedAssetAndNativeProjectionMatchDirectAuthority()
     {
         byte[] raw = ReadEmbeddedCurrentAsset("GalaxyMap.dat");
@@ -101,7 +101,7 @@ public sealed class Net7AssetDirectAuditTests
             Net7LocalDataAssets.CurrentGalaxyMap.Gates.Select(record => record.GateHashId));
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void InstalledLauncherCDataDecodesEveryIndexedRecord()
     {
         // The container checks in Net7CDataCatalog.Decode are file-format

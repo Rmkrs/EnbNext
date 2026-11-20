@@ -37,7 +37,7 @@ public sealed class EnbControlsNativeInputTests
         public void Dispose() { Panel.Dispose(); Dialog.Dispose(); }
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void ClickingBindingPreviewsAndCommitsOnlyOnKeyRelease()
     {
         using var f = new Fixture(); string action = f.Panel.Rows[0].Action;
@@ -51,7 +51,7 @@ public sealed class EnbControlsNativeInputTests
         Assert.Equal(code, f.Panel.Draft.Binding(action, 1)!.Code); Assert.Null(f.Confirmation.Text);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void WheelUsesPanelBoundsAndModifiedWheelDoesNotDispatchParentCommand()
     {
         using var f = new Fixture(); Assert.True(f.Panel.Rows.Length > 11);
@@ -67,7 +67,7 @@ public sealed class EnbControlsNativeInputTests
         Assert.Equal(1, f.Panel.ScrollInput.Value); Assert.Null(f.Panel.Capture.Action); Assert.False(f.Panel.Keyboard.Enabled);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void RightSliderCaptureRepeatsThenReleasesOutside()
     {
         using var f = new Fixture(); var point = f.Panel.Resources.Down.Center;
@@ -78,7 +78,7 @@ public sealed class EnbControlsNativeInputTests
         Assert.Equal(EnbScrollbarPart.None, f.Panel.ScrollInput.Pressed);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void ModalBlocksParentCommandsAndAnswersThroughSharedCapture()
     {
         using var f = new Fixture(); f.Confirmation.Show("Keep this mapping?", false);
@@ -89,7 +89,7 @@ public sealed class EnbControlsNativeInputTests
         f.Frame(1, 0x1000); f.Click("control/TOP_BUTTON01"); Assert.Equal("Activation", f.Panel.Category);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void ModifierOnlyCaptureUsesActualHeldStateAndRetirementClearsEverything()
     {
         using var f = new Fixture(); f.Click("control/PRIME_KEY00");

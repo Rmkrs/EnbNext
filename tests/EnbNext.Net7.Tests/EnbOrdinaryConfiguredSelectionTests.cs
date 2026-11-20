@@ -6,7 +6,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbOrdinaryConfiguredSelectionTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData("registered-variant",false)]
     [InlineData("registered-variant",true)]
     [InlineData("registered-original",false)]

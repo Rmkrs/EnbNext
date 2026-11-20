@@ -8,7 +8,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbStandalonePrimitiveTextureTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(false)] [InlineData(true)]
     public void PrimitiveRecolorUsesTheDirectRetainedTexturePath(bool sphere)
     {
@@ -32,7 +32,7 @@ public sealed class EnbStandalonePrimitiveTextureTests
         Assert.NotSame(source.Image,second.CurrentRetailResolvedTexture!.Image);
     }
 
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(false,false)] [InlineData(false,true)]
     [InlineData(true,false)] [InlineData(true,true)]
     public void NamedFailureRetainsNativeImageWhileEmptyNameStaysUnbound(bool sphere,bool empty)

@@ -5,7 +5,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbEmptyAggregateEffectTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(false)] [InlineData(true)]
     public void EmptyHmodelRetainsContinuousSpriteWithoutStreakSibling(bool next)
     {
@@ -30,7 +30,7 @@ public sealed class EnbEmptyAggregateEffectTests
         Assert.Contains(emitter.WorldBirths,b=>System.Numerics.Vector3.Distance(b.World.Translation,emitter.CurrentWorld.Translation)>1);
     }
 
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(false)] [InlineData(true)]
     public void EmptyHmodelAnimationMovesItsParticleChildren(bool next)
     {
@@ -65,7 +65,7 @@ public sealed class EnbEmptyAggregateEffectTests
         }
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void NamedEmptyHierarchyModelRetainsItsHierarchyWithoutGeometry()
     {
         var assets=EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);

@@ -63,7 +63,7 @@ public sealed class EnbConfirmationInputTests
         Assert.All(labels,label=>{Assert.True(label.Bounds.Left>=draws[0].Bounds.Left);Assert.True(label.Bounds.Right<=draws[0].Bounds.Right);});
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void DialogChildrenShareCaptureAndRetireWithoutClearingParent()
     {
         var assets = EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);

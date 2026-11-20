@@ -9,7 +9,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbCapturedMissileTimingTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(10000u)]
     [InlineData(4294964295u)]
     public void CapturedSuccessiveMissilesKeepIndependentOverlappingImpactTails(uint start)
@@ -65,7 +65,7 @@ public sealed class EnbCapturedMissileTimingTests
     // Exact 000B payloads from the passive September 11 combat audits.
     // Endpoints are not materialized; this checks packet/state/scheduler timing,
     // not captured movement, GPU rendering, or the server clock conversion.
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData("0708B38701002D1E014052030098A81400941AA13BE00A00000000", 2784, 0x187B3u)]
     [InlineData("0708B48701002D1E014052030060931400B721E33BCC0800000000", 2252, 0x187B4u)]
     [InlineData("0708B48701002D1E014052030072931400CE32E33B310500000000", 1329, 0x187B4u)]

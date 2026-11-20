@@ -7,7 +7,7 @@ namespace EnbNext.Net7.Tests;
 [Collection(LoadSensitiveCollection.Name)]
 public sealed class EnbGraphicsNativeInputTests
 {
-    [Fact]
+    [InstalledRetailFact]
     public void ActualGraphicsOwnersHandleCaptureDisabledRowsModifiersAndRetirement()
     {
         var assets=EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);var resources=EnbRenderSession.Of(assets);
@@ -117,7 +117,7 @@ public sealed class EnbGraphicsNativeInputTests
         state.Retire(null,null);Assert.Null(Step(arrow,7522,1));Assert.False(panel.Contains(.5f,.5f,true,3));
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void SharedDispatcherCompletesWithoutSubscriberAndPreservesQueuedRelease()
     {
         var assets=EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);var resources=EnbRenderSession.Of(assets);

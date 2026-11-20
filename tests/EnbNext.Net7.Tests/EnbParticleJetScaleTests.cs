@@ -5,7 +5,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbParticleJetScaleTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(.5f)]
     [InlineData(2f)]
     public void FactoryScaleChangesSpatialPropertiesBeforeJetLifetimeSelection(float scale)

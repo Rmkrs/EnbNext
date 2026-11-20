@@ -9,7 +9,7 @@ namespace EnbNext.Net7.Tests;
 [Collection(LoadSensitiveCollection.Name)]
 public sealed class EnbBrowserPanelTests
 {
-    [Fact]
+    [InstalledRetailFact]
     public void BrowserCollectionOwnsCaptureCommandOrderAndRetirement()
     {
         var assets=EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);var resources=EnbRenderSession.Of(assets);
@@ -33,7 +33,7 @@ public sealed class EnbBrowserPanelTests
         panel.Dispose();Assert.Equal(0,collection.Context.Count);Assert.False(collection.HasCapture);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void BrowserResourcesStayInAssetOwnerAndPanelInstancesRetireIndependently()
     {
         var paths=EnbInstalledAssetLocator.TryLocate()!;

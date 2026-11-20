@@ -8,7 +8,7 @@ namespace EnbNext.Net7.Tests;
 public sealed class EnbParticlePayloadCompatibilityTests
 {
 
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData("FLARE.W3D")] [InlineData("astro00.w3d")] [InlineData("ms02a-pat.w3d")]
     public void NativeChunkHintsTailsAndUnknownOptionalsPreserveDefinition(string name)
     {
@@ -47,7 +47,7 @@ public sealed class EnbParticlePayloadCompatibilityTests
         Assert.Equal(new EnbCurrentRetailParticleScalarKey(0,.75f),Assert.Single(property.Keys));
     }
 
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData("FLARE.W3D")]
     [InlineData("P_PURP.W3D")]
     [InlineData("SGBLAST.W3D")]
@@ -121,7 +121,7 @@ public sealed class EnbParticlePayloadCompatibilityTests
         Assert.False(EnbCurrentRetailParticleEmitterDecoder.TryDecode(Legacy(Chunk(type, keys[..24])), out _, out _));
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void NativeRejectedInstalledAdditionalRotationKeyStillFails()
     {
         var assets = EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);

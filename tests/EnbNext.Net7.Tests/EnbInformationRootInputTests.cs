@@ -8,7 +8,7 @@ namespace EnbNext.Net7.Tests;
 [Collection(LoadSensitiveCollection.Name)]
 public sealed class EnbInformationRootInputTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData("help")]
     [InlineData("complaint")]
     public void RootUsesModelHitsCaptureWithoutSelectionAndOwnerMovement(string prefix)

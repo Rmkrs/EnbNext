@@ -53,7 +53,7 @@ public sealed class Net7DirectAuditCrossCategoryIntegrationTests
             Net7GameplayProvenance.GetOwners(0x2025).ToArray());
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void LocalAssetReadsAndPresentationResolutionDoNotMutateAuthoritativeGameplayState()
     {
         var gameplay = new Net7GameplayState();

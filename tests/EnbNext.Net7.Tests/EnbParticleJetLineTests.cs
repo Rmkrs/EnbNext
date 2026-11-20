@@ -7,7 +7,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbParticleJetLineTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(2198)]
     [InlineData(2197)]
     [InlineData(2313)]

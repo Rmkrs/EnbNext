@@ -6,7 +6,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbRetainedParticleTextureTests
 {
-    [Fact]
+    [InstalledRetailFact]
     public void LinePacketRetainsItsBufferTextureAfterRegistryReplacement()
     {
         var assets=EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);
@@ -31,7 +31,7 @@ public sealed class EnbRetainedParticleTextureTests
         Assert.All(bindings,b=>Assert.Same(particle.RetainedTexture,b.CurrentRetailResolvedTexture));
     }
 
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(false)] [InlineData(true)]
     public void RecolorAndDrawRetainTheAcquiredParticleTexture(bool streak)
     {
@@ -81,7 +81,7 @@ public sealed class EnbRetainedParticleTextureTests
         Assert.All(bindings,b=>Assert.Same(retained,b.CurrentRetailResolvedTexture));
     }
 
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(false)] [InlineData(true)]
     public void MissingAndEmptyParticleTexturesSurviveRecolor(bool empty)
     {

@@ -6,7 +6,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbObjectLineTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(519)] [InlineData(520)] [InlineData(442)] [InlineData(443)]
     public void ObjectLineBudgetUsesLocalBoundsAndAuthoredSegmentCosts(int id)
     {

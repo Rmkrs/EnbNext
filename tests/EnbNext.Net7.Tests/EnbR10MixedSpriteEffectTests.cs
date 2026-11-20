@@ -7,7 +7,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbR10MixedSpriteEffectTests
 {
-    [Fact]
+    [InstalledRetailFact]
     public void AnimatedShrineRetainsWorldBirthsAndUsesFourByFourSpriteCells()
     {
         var assets=EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);

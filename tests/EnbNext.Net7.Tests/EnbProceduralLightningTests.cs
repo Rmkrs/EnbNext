@@ -6,7 +6,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbProceduralLightningTests
 {
-    [Fact]
+    [InstalledRetailFact]
     public void SelectedDetailLimitsSubmittedLightningTrianglesAfterCoalescing()
     {
         var assets=EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);
@@ -21,7 +21,7 @@ public sealed class EnbProceduralLightningTests
             Assert.Equal(0,packet.Mesh.Indices.Count%3);
         }
     }
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(67)] [InlineData(453)] [InlineData(437)] [InlineData(439)] [InlineData(440)]
     [InlineData(442)] [InlineData(446)] [InlineData(529)] [InlineData(1059)] [InlineData(1885)]
     [InlineData(197)] [InlineData(2036)] [InlineData(2261)]
@@ -42,7 +42,7 @@ public sealed class EnbProceduralLightningTests
         Assert.All(first.Mesh.Indices,i=>Assert.InRange(i,0u,(uint)positions.Count-1));
     }
 
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(519,4)] [InlineData(520,6)]
     public void EnergyProjectilesRetainTheirContiguousAuthoredPointChains(int id,int count)
     {
@@ -59,7 +59,7 @@ public sealed class EnbProceduralLightningTests
         Assert.Equal((count-1)*line.Line.Tile,uv[^1].Y);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void PlasmaJaggedProjectileUsesNativeCoincidentDefaultsBeforeNoise()
     {
         var assets=EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);

@@ -7,7 +7,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbNormalAtlasPassTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(212,400,6400)]
     [InlineData(10086,0,7000)]
     public void InstalledInfiniteNormalAtlasRetiresAtItsCycleBoundary(int id,uint start,uint end)
@@ -28,7 +28,7 @@ public sealed class EnbNormalAtlasPassTests
         Assert.Equal(0,scheduler.TrackedRootCount);
     }
 
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(212)]
     [InlineData(10056)]
     [InlineData(10086)]

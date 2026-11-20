@@ -7,7 +7,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbStandaloneParticleTextureTests
 {
-    [Fact]
+    [InstalledRetailFact]
     public void MissingParticleTextureRetainsNativeImageBindingInsteadOfBecomingUntextured()
     {
         var assets=EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);
@@ -33,7 +33,7 @@ public sealed class EnbStandaloneParticleTextureTests
         Assert.Null((particle with {Definition=particle.Definition.Copy().SetTextureFileName("")}).PrepareTexture(assets).RuntimeTextureName);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void AuthoredEmptyTextureKeepsStandaloneParticleUnbound()
     {
         var assets=EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);

@@ -5,7 +5,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbBridgeModeStorageTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(true)]
     [InlineData(false)]
     public void CameraModeUsesSharedRetailOptionsAndPreservesOtherValues(bool existing)

@@ -6,7 +6,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbRingAssemblyTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(1877)] [InlineData(1856)]
     public void RingParentRetainsForcedDetailWithOrWithoutEmitterSibling(int baseId)
     {
@@ -26,7 +26,7 @@ public sealed class EnbRingAssemblyTests
         Assert.Equal(baseId==1856,loaded.Mixed is not null);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void MeshParentKeepsMultipleDetailLevelsBesideIndependentRings()
     {
         var assets=EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);
@@ -59,7 +59,7 @@ public sealed class EnbRingAssemblyTests
         Assert.InRange(Vector3.Distance(maximum,bounds.LocalBox.Center+bounds.LocalBox.Extents),0,.001f);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void RingAssemblyRetainsPreparedNextAnimation()
     {
         var assets=EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);

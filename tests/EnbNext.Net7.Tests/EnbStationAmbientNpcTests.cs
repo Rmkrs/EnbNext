@@ -92,7 +92,7 @@ public sealed class EnbStationAmbientNpcTests
         motion.BeginInteraction(Matrix4x4.Identity);Assert.Equal(0,motion.Remaining);
         motion.EndInteraction();Assert.Equal(1,motion.Remaining);
     }
-    [Fact]
+    [InstalledRetailFact]
     public void InstalledProgenLoungeProvidesTheAuthoredRouteInsteadOfAvatarSlotBones()
     {
         var assets=EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);
@@ -110,7 +110,7 @@ public sealed class EnbStationAmbientNpcTests
         Assert.Equal(99,definition.Actions[^1].High);
         Assert.NotEqual(definition.InitialTransform,definition.Destinations[1]);
     }
-    [Fact]
+    [InstalledRetailFact]
     public void MissingAmbientDocumentCreatesNoActor()
     {
         // 00642740 returns NULL when %sstarbase_ambient.ini does not load; only the

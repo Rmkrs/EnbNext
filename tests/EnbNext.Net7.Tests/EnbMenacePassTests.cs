@@ -7,7 +7,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbMenacePassTests
 {
-    [Fact]
+    [InstalledRetailFact]
     public void GateHoldCancelsSurfaceAndObjectTailIndependently()
     {
         var paths=EnbInstalledAssetLocator.TryLocate();Assert.NotNull(paths);

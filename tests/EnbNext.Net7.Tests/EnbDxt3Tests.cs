@@ -25,7 +25,7 @@ public sealed class EnbDxt3Tests
         Assert.False(EnbCurrentRetailHsvRuntime.TryRecolorDds(bytes,new(60,0,0),out _));
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void InstalledMenaceTextureIsDecodedRatherThanSubstituted()
     {
         var assets=EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);

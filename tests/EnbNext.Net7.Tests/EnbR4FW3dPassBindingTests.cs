@@ -34,7 +34,7 @@ public sealed class EnbR4FW3dPassBindingTests
         Assert.True(float.IsNaN(uv[2].Y));Assert.Equal(Vector2.One,uv[3]);
     }
 
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData("GST08.w3d",6)] [InlineData("NPC15A.w3d",1)]
     public void InstalledNonfiniteUvDoesNotEraseMeshPrototypes(string fileName,int expectedMeshes)
     {
@@ -46,7 +46,7 @@ public sealed class EnbR4FW3dPassBindingTests
         Assert.Equal(expectedMeshes,affected);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void MeshHsvSkipsAuthoredSpecularChunkAndPreservesItsBytes()
     {
         var textures = EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!).Textures;

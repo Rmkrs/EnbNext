@@ -6,7 +6,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbShieldDrainGraphTests
 {
-    [Fact]
+    [InstalledRetailFact]
     public void InstalledShieldDrainPreservesOverlappingOffPhaseAndIndependentSurface()
     {
         var paths=EnbInstalledAssetLocator.TryLocate();Assert.NotNull(paths);

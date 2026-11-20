@@ -7,7 +7,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbOrdinaryAggregateLineParticleTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData("weap_am03p1")]
     [InlineData("weap_am03p2")]
     public void InstalledRejectedOrdinaryLinesRequireRetainedBirths(string name)

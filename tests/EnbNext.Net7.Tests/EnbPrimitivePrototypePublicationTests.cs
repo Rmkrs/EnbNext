@@ -6,7 +6,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbPrimitivePrototypePublicationTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(false)] [InlineData(true)]
     public void ConfiguredNameRejectsFileDuplicateUntilRemoval(bool sphere)
     {
@@ -42,7 +42,7 @@ public sealed class EnbPrimitivePrototypePublicationTests
         Assert.True(EnbRetailW3dFileResolver.TryDecodeFile("retained.w3d",name,bytes,null,"absent-primitive.w3d",assets.MixResources,out var source,out var error),error);
         return source;
     }
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(false)] [InlineData(true)]
     public void RetainedDefinitionSurvivesDuplicatePublicationAndAbsentFile(bool sphere)
     {
@@ -62,7 +62,7 @@ public sealed class EnbPrimitivePrototypePublicationTests
         if(sphere)Assert.Same(source.Model.Spheres[0],Assert.Single(built.Spheres!.Spheres).Asset.Definition);
         else Assert.Same(source.Model.Rings[0],Assert.Single(built.Rings!.Rings).Asset.Definition);
     }
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(false)] [InlineData(true)]
     public void FirstAuthoredPrimitiveKindWinsTheSharedName(bool sphereFirst)
     {
@@ -76,7 +76,7 @@ public sealed class EnbPrimitivePrototypePublicationTests
         var built=EnbCurrentRetailRObjEffectAsset.LoadPrototype(assets,source,Vector3.Zero);
         Assert.Equal(sphereFirst,built.Spheres is not null);Assert.Equal(!sphereFirst,built.Rings is not null);
     }
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(false)] [InlineData(true)]
     public void AggregateCreatesNamedInstanceAndPublishesButDiscardsChildren(bool sphere)
     {
@@ -96,7 +96,7 @@ public sealed class EnbPrimitivePrototypePublicationTests
         Assert.Equal("WRAP739",sphere?Assert.Single(built.Spheres!.Spheres).Asset.Header.Name:Assert.Single(built.Rings!.Rings).Asset.Header.Name);
         Assert.Equal("PRIM739",sphere?source.Model.Spheres[0].Header.Name:source.Model.Rings[0].Header.Name);
     }
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(false,130)] [InlineData(true,130)]
     [InlineData(false,1857)] [InlineData(true,1857)]
     [InlineData(false,1877)] [InlineData(true,1877)]
@@ -117,7 +117,7 @@ public sealed class EnbPrimitivePrototypePublicationTests
         if(sphere)Assert.Same(primitive.Model.Spheres[0],Assert.Single(built.Spheres!.Spheres,s=>s.Asset.Header.Name=="PRIM739").Asset.Definition);
         else Assert.Same(primitive.Model.Rings[0],Assert.Single(built.Rings!.Rings,r=>r.Asset.Header.Name=="PRIM739").Asset.Definition);
     }
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(false,130)] [InlineData(true,130)]
     [InlineData(false,1857)] [InlineData(true,1857)]
     [InlineData(false,1877)] [InlineData(true,1877)]
@@ -141,7 +141,7 @@ public sealed class EnbPrimitivePrototypePublicationTests
         if(sphere)Assert.Same(primitive.Model.Spheres[0],Assert.Single(built.Spheres!.Spheres,s=>s.Asset.Header.Name=="WRAP739").Asset.Definition);
         else Assert.Same(primitive.Model.Rings[0],Assert.Single(built.Rings!.Rings,r=>r.Asset.Header.Name=="WRAP739").Asset.Definition);
     }
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(false)] [InlineData(true)]
     public void RslCreationKeepsThePreparedPrimitiveChildNamespace(bool sphere)
     {
@@ -168,7 +168,7 @@ public sealed class EnbPrimitivePrototypePublicationTests
         if(sphere)Assert.Same(primitive.Model.Spheres[0],Assert.Single(built.Spheres!.Spheres,s=>s.Asset.Header.Name=="WRAP739").Asset.Definition);
         else Assert.Same(primitive.Model.Rings[0],Assert.Single(built.Rings!.Rings,r=>r.Asset.Header.Name=="WRAP739").Asset.Definition);
     }
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(false,false,false)] [InlineData(true,false,false)]
     [InlineData(false,true,false)] [InlineData(true,true,false)]
     [InlineData(false,false,true)] [InlineData(true,false,true)]
@@ -213,7 +213,7 @@ public sealed class EnbPrimitivePrototypePublicationTests
         }
         finally {File.Delete(path);}
     }
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(false)] [InlineData(true)]
     public void IncompleteSiblingRemainsUnrepresented(bool sphere)
     {

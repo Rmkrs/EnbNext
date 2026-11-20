@@ -6,7 +6,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbAggregateBoneLookupTests
 {
-    [Fact]
+    [InstalledRetailFact]
     public void EffectAggregateUsesSameMissingBoneRuleAsOrdinaryAggregate()
     {
         var paths=EnbInstalledAssetLocator.TryLocate();
@@ -40,7 +40,7 @@ public sealed class EnbAggregateBoneLookupTests
         Assert.False(EnbCurrentRetailAggregateBoneLookup.TryResolve(empty,"CAM_TERMINAL00",out _));
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void InstalledBst35MissingEmitterBoneResolvesToRoot()
     {
         var paths=EnbInstalledAssetLocator.TryLocate();

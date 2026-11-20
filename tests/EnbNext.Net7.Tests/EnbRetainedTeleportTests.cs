@@ -7,7 +7,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbRetainedTeleportTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData("av_tele01",3200)]
     [InlineData("av_tele02",1000)]
     [InlineData("av_tele03",1000)]
@@ -39,7 +39,7 @@ public sealed class EnbRetainedTeleportTests
         Assert.Empty(beam.Build((long)Math.Ceiling(beam.TailDurationMilliseconds)+200,origin,camera));
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void SharedSceneKeepsDestroyedOwnersBuffersAcrossReplacement()
     {
         var assets=EnbRetailAssetBundle.Load(EnbInstalledAssetLocator.TryLocate()!);

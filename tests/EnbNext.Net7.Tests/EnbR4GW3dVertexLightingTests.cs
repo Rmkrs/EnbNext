@@ -223,7 +223,7 @@ public sealed class EnbR4GW3dVertexLightingTests
         Assert.Equal(expectedLightingEnabled, semantics.VertexLighting.LightingEnabled);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void DuplicateDiffuseColorIsPreservedAsSecondaryDescriptorProvenanceButPrimaryStillRenders()
     {
         EnbRenderColor32 primary = new(1, 2, 3, 4);

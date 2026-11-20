@@ -8,7 +8,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbR4WLegacyRootMaterialTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData("TRUNK01.w3d",3)] [InlineData("TRUNK02.w3d",6)]
     public void InstalledLegacyTreesDecodeWithoutContainerHints(string name,int triangleCount)
     {

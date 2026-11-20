@@ -6,7 +6,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbVrixDefensiveGraphTests
 {
-    [Fact]
+    [InstalledRetailFact]
     public void RemovalBeforeLinkDelayNeverActivatesTargetShield()
     {
         var paths=EnbInstalledAssetLocator.TryLocate();Assert.NotNull(paths);
@@ -26,7 +26,7 @@ public sealed class EnbVrixDefensiveGraphTests
         Assert.Equal(0,scheduler.TrackedRootCount);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public void InstalledInfiniteChainDelaysTargetShieldAndRetiresFromSnapshotRemoval()
     {
         var paths=EnbInstalledAssetLocator.TryLocate();Assert.NotNull(paths);

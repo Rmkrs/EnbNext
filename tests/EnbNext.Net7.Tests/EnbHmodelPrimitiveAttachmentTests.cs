@@ -6,7 +6,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbHmodelPrimitiveAttachmentTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(130)] [InlineData(230)]
     public void TerminalDeactivationResetsAllSiblingPosesWithoutStoppingEmitters(int baseId)
     {
@@ -40,7 +40,7 @@ public sealed class EnbHmodelPrimitiveAttachmentTests
         }
     }
 
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(130,"ring")] [InlineData(230,"ring")]
     [InlineData(130,"sphere")] [InlineData(230,"sphere")]
     [InlineData(130,"both")] [InlineData(230,"both")]

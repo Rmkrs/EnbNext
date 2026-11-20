@@ -13,7 +13,7 @@ namespace EnbNext.Net7.Tests;
 [Collection(LoadSensitiveCollection.Name)]
 public sealed class EnbClientSectorEntryTests
 {
-    [Fact]
+    [InstalledRetailFact]
     public void EmbeddedCurrentLocalDataIsPinnedAndReadyWithoutExternalPaths()
     {
         Assert.Equal(19, Net7LocalDataAssets.CurrentGalaxyMap.Systems.Count);
@@ -22,7 +22,7 @@ public sealed class EnbClientSectorEntryTests
         Assert.Equal(5_530, Net7LocalDataAssets.CurrentCData.RecordCount);
     }
 
-    [Fact]
+    [InstalledRetailFact]
     public async Task NormalClientFlow_SelectThenEnterGame_ReachesInWorldAndRemainsConnected()
     {
         await using var harness = await ClientEntryHarness.CreateAsync();

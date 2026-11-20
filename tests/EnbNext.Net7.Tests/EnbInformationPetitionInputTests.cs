@@ -9,7 +9,7 @@ namespace EnbNext.Net7.Tests;
 [Collection(LoadSensitiveCollection.Name)]
 public sealed class EnbInformationPetitionInputTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(1u)]
     [InlineData(3u)]
     public void CombinedEditorsAttachmentsModalAndRetirement(uint category)

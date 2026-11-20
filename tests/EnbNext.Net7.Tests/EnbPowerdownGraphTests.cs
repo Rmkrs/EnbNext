@@ -6,7 +6,7 @@ namespace EnbNext.Net7.Tests;
 
 public sealed class EnbPowerdownGraphTests
 {
-    [Theory]
+    [InstalledRetailTheory]
     [InlineData(338,339)]
     [InlineData(340,341)]
     [InlineData(342,343)]
