@@ -1,0 +1,15 @@
+# Build output and caches
+bin/
+obj/
+.build/
+.vs/
+*.user
+# Test and diagnostic output
+TestResults/
+*.trx
+*.dmp
+*.log
+# Local research and capture output
+research/
+artifacts/
+captures/

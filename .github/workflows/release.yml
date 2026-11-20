@@ -1,0 +1,80 @@
+name: Release
+
+# A tag such as v0.1.0 builds, tests and publishes the Windows and Linux packages as a GitHub release.
+# Run it by hand (Actions > Release > Run workflow) to get the packages as build artifacts without a release.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Version
+        id: version
+        shell: pwsh
+        run: |
+          $version = if ($env:GITHUB_REF_TYPE -eq 'tag') { $env:GITHUB_REF_NAME.TrimStart('v') } else { '0.0.0-dev.' + $env:GITHUB_RUN_NUMBER }
+          "value=$version" >> $env:GITHUB_OUTPUT
+      - name: Test
+        run: dotnet test EnbNext.slnx -c Release --filter "Category!=Heavy" -p:Version=${{ steps.version.outputs.value }}
+      - name: Publish
+        shell: pwsh
+        run: |
+          dotnet publish src/EnbNext.App -c Release -r win-x64 --self-contained true -p:PublishReadyToRun=true -p:Version=${{ steps.version.outputs.value }} -o publish/EnbNext
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Get-ChildItem publish/EnbNext -Recurse -Filter *.pdb | Remove-Item
+          Copy-Item LICENSE, THIRD_PARTY_NOTICES.md, README.md publish/EnbNext
+          Compress-Archive -Path publish/EnbNext -DestinationPath "EnbNext-${{ steps.version.outputs.value }}-win-x64.zip"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: EnbNext-*-win-x64.zip
+
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Version
+        id: version
+        run: |
+          if [ "$GITHUB_REF_TYPE" = tag ]; then echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"; else echo "value=0.0.0-dev.$GITHUB_RUN_NUMBER" >> "$GITHUB_OUTPUT"; fi
+      - name: Publish
+        run: |
+          dotnet publish src/EnbNext.App -c Release -r linux-x64 --self-contained true -p:Version=${{ steps.version.outputs.value }} -o publish/EnbNext
+          find publish/EnbNext -name '*.pdb' -delete
+          cp LICENSE THIRD_PARTY_NOTICES.md README.md publish/EnbNext/
+          chmod 755 publish/EnbNext/EnbNext publish/EnbNext/cef/EnbNext.CefHelper
+          tar -C publish -czf "EnbNext-${{ steps.version.outputs.value }}-linux-x64.tar.gz" EnbNext
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: EnbNext-*-linux-x64.tar.gz
+
+  release:
+    if: github.ref_type == 'tag'
+    needs: [windows, linux]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+      - name: Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" EnbNext-* --repo "$GITHUB_REPOSITORY" --title "EnbNext $GITHUB_REF_NAME" --generate-notes

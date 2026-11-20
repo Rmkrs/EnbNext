@@ -1,0 +1,58 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>EnbNext.App</RootNamespace>
+    <AssemblyName>EnbNext</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Native\Cef\EnbNext.ico</ApplicationIcon>
+    <AssemblyTitle>EnbNext</AssemblyTitle>
+    <Product>EnbNext</Product>
+    <BinkHostDirectory>$([System.IO.Path]::Combine('$(MSBuildProjectDirectory)', '$(BaseIntermediateOutputPath)', 'bink', '$(Configuration)'))</BinkHostDirectory>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EnbNext.Assets\EnbNext.Assets.csproj" />
+    <ProjectReference Include="..\EnbNext.Client\EnbNext.Client.csproj" />
+    <ProjectReference Include="..\EnbNext.Engine\EnbNext.Engine.csproj" />
+    <ProjectReference Include="..\EnbNext.Host.Sdl\EnbNext.Host.Sdl.csproj" />
+    <ProjectReference Include="..\EnbNext.Presentation\EnbNext.Presentation.csproj" />
+    <ProjectReference Include="..\EnbNext.Rendering\EnbNext.Rendering.csproj" />
+    <ProjectReference Include="..\EnbNext.Rendering.OpenGL\EnbNext.Rendering.OpenGL.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Assets\Icon\EnbNext.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Assets\Audio\CharacterCreation\*.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+  <!-- The Bink video host is a Windows x86 program; a Linux build or publish does not carry it. -->
+  <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows')) and '$(RuntimeIdentifier)' != 'linux-x64'">
+    <None Include="$(BinkHostDirectory)\EnbNext.BinkHost.exe" Link="EnbNext.BinkHost.exe" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+  <Target Name="BuildBinkHost" BeforeTargets="CoreCompile;GetCopyToOutputDirectoryItems" Condition="$([MSBuild]::IsOSPlatform('Windows')) and '$(RuntimeIdentifier)' != 'linux-x64'" Inputs="$(MSBuildProjectDirectory)\Native\BinkHost.cpp;$(MSBuildProjectDirectory)\..\..\tools\Build-BinkHost.ps1" Outputs="$(BinkHostDirectory)\EnbNext.BinkHost.exe">
+    <Exec Command="pwsh -NoProfile -File &quot;$(MSBuildProjectDirectory)\..\..\tools\Build-BinkHost.ps1&quot; -Source &quot;$(MSBuildProjectDirectory)\Native\BinkHost.cpp&quot; -OutputDirectory &quot;$(BinkHostDirectory)&quot;" />
+  </Target>
+  <PropertyGroup>
+    <CefRuntime Condition="'$(RuntimeIdentifier)' == 'linux-x64' or !$([MSBuild]::IsOSPlatform('Windows'))">linux-x64</CefRuntime>
+    <CefRuntime Condition="'$(CefRuntime)' == ''">win-x64</CefRuntime>
+    <CefOutput>$(MSBuildProjectDirectory)/obj/cef/$(CefRuntime)</CefOutput>
+  </PropertyGroup>
+  <Target Name="PrepareCef" BeforeTargets="PrepareForBuild" Condition="'$(SkipCefBuild)' != 'true'">
+    <Exec Command="pwsh -NoProfile -File &quot;$(MSBuildProjectDirectory)/../../tools/Prepare-Cef.ps1&quot; -CacheDirectory &quot;$(EnbNextBuildCache)&quot; -Runtime $(CefRuntime) -Destination &quot;$(CefOutput)&quot;" />
+    <ItemGroup><CefPayload Include="$(CefOutput)/**/*" /><Content Include="@(CefPayload)" Link="cef/%(CefPayload.RecursiveDir)%(CefPayload.Filename)%(CefPayload.Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" /></ItemGroup>
+  </Target>
+  <Target Name="CefLinuxBuildPermissions" AfterTargets="CopyFilesToOutputDirectory" Condition="$([MSBuild]::IsOSPlatform('Linux'))">
+    <Exec Command="chmod 755 &quot;$(TargetDir)cef/EnbNext.CefHelper&quot;" />
+  </Target>
+  <Target Name="CefLinuxPublishPermissions" AfterTargets="Publish" Condition="$([MSBuild]::IsOSPlatform('Linux'))">
+    <Exec Command="chmod 755 &quot;$(PublishDir)cef/EnbNext.CefHelper&quot;" />
+  </Target>
+  <ItemGroup></ItemGroup>
+</Project>

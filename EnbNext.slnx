@@ -1,0 +1,21 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/EnbNext.App/EnbNext.App.csproj" />
+    <Project Path="src/EnbNext.Assets/EnbNext.Assets.csproj" />
+    <Project Path="src/EnbNext.Client/EnbNext.Client.csproj" />
+    <Project Path="src/EnbNext.Engine/EnbNext.Engine.csproj" />
+    <Project Path="src/EnbNext.Host.Sdl/EnbNext.Host.Sdl.csproj" />
+    <Project Path="src/EnbNext.Installation/EnbNext.Installation.csproj" />
+    <Project Path="src/EnbNext.Net7/EnbNext.Net7.csproj" />
+    <Project Path="src/EnbNext.Presentation/EnbNext.Presentation.csproj" />
+    <Project Path="src/EnbNext.Protocol/EnbNext.Protocol.csproj" />
+    <Project Path="src/EnbNext.Rendering.OpenGL/EnbNext.Rendering.OpenGL.csproj" />
+    <Project Path="src/EnbNext.Rendering/EnbNext.Rendering.csproj" />
+    <Project Path="src/EnbNext.RetailMath/EnbNext.RetailMath.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/EnbNext.Net7.Tests/EnbNext.Net7.Tests.csproj" />
+    <Project Path="tests/EnbNext.Protocol.Tests/EnbNext.Protocol.Tests.csproj" />
+    <Project Path="tests/EnbNext.TestSupport/EnbNext.TestSupport.csproj" />
+  </Folder>
+</Solution>

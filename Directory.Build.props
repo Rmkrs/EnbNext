@@ -1,0 +1,12 @@
+<Project>
+  <PropertyGroup>
+    <EnbNextBuildCache>$(MSBuildThisFileDirectory).build</EnbNextBuildCache>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!-- Release builds set the version from the tag (v0.1.0 -> 0.1.0). -->
+    <Version>0.1.0</Version>
+  </PropertyGroup>
+  <Import Project="$(EnbNextWorkshopProps)" Condition="'$(EnbNextWorkshopProps)' != ''" />
+</Project>

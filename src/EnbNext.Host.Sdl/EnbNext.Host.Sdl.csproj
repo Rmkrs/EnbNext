@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <IsPackable>false</IsPackable>
+    <AngleDirectory>$(EnbNextBuildCache)/dependencies/electron-angle-41.0.3</AngleDirectory>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../EnbNext.Engine/EnbNext.Engine.csproj" />
+    <PackageReference Include="ppy.SDL3-CS" Version="[2026.1002.1]" />
+    <PackageReference Include="SkiaSharp" Version="[3.119.4]" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Win32" Version="[3.119.4]" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="[3.119.4]" />
+    <PackageReference Include="HarfBuzzSharp" Version="[8.3.1.3]" />
+    <PackageReference Include="HarfBuzzSharp.NativeAssets.Win32" Version="[8.3.1.3]" />
+    <PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" Version="[8.3.1.3]" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="EnbNext" />
+
+    <InternalsVisibleTo Include="EnbNext.Net7.Tests" />
+
+    <InternalsVisibleTo Include="EnbNext.TestSupport" />
+  </ItemGroup>
+  <ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows')) and '$(RuntimeIdentifier)' != 'linux-x64'">
+    <None Include="$(AngleDirectory)\libEGL.dll;$(AngleDirectory)\libGLESv2.dll;$(AngleDirectory)\electron-LICENSE;$(AngleDirectory)\LICENSES.chromium.html" Link="runtimes/win-x64/native/enb-angle/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+  <Target Name="RestorePinnedAngle" BeforeTargets="PrepareForBuild" Condition="$([MSBuild]::IsOSPlatform('Windows')) and '$(RuntimeIdentifier)' != 'linux-x64'">
+    <Exec Command="pwsh -NoProfile -File &quot;$(MSBuildThisFileDirectory)..\..\tools\Restore-Angle.ps1&quot; -Destination &quot;$(AngleDirectory)&quot;" />
+  </Target>
+</Project>

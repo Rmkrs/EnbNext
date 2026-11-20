@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>EnbNext.Rendering</RootNamespace>
+    <AssemblyName>EnbNext.Rendering</AssemblyName>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="EnbNext.Net7.Tests" />
+
+<InternalsVisibleTo Include="EnbNext.TestSupport" />
+    <InternalsVisibleTo Include="EnbNext.Rendering.OpenGL" />
+    <ProjectReference Include="..\EnbNext.Assets\EnbNext.Assets.csproj" />
+    <ProjectReference Include="..\EnbNext.Presentation\EnbNext.Presentation.csproj" />
+    <ProjectReference Include="..\EnbNext.RetailMath\EnbNext.RetailMath.csproj" />
+    <Compile Remove="EnbRetailLineArithmetic.cs;EnbRetailExtendedX87Register.cs;EnbRetailDirectQuaternionInterpolation.cs;EnbRetailCameraLookAt.cs" />
+    <Compile Remove="EnbRetailCameraQuaternionBasis.cs;EnbRetailSpatialBasis.cs" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>EnbNext.Client</RootNamespace>
+    <AssemblyName>EnbNext.Client</AssemblyName>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EnbNext.Assets\EnbNext.Assets.csproj" />
+    <ProjectReference Include="..\EnbNext.Protocol\EnbNext.Protocol.csproj" />
+    <ProjectReference Include="..\EnbNext.Presentation\EnbNext.Presentation.csproj" />
+    <ProjectReference Include="..\EnbNext.Net7\EnbNext.Net7.csproj" />
+  </ItemGroup>
+</Project>

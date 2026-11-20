@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Compile the established arithmetic sources once. Preserve their public
+         namespace/API while allowing protocol-world and rendering consumers. -->
+    <Compile Include="..\EnbNext.Rendering\EnbRetailLineArithmetic.cs" Link="EnbRetailLineArithmetic.cs" />
+    <Compile Include="..\EnbNext.Rendering\EnbRetailExtendedX87Register.cs" Link="EnbRetailExtendedX87Register.cs" />
+    <Compile Include="..\EnbNext.Rendering\EnbRetailDirectQuaternionInterpolation.cs" Link="EnbRetailDirectQuaternionInterpolation.cs" />
+    <Compile Include="..\EnbNext.Rendering\EnbRetailCameraLookAt.cs" Link="EnbRetailCameraLookAt.cs" />
+    <Compile Include="..\EnbNext.Rendering\EnbRetailSpatialBasis.cs" Link="EnbRetailSpatialBasis.cs" />
+    <Compile Include="..\EnbNext.Rendering\EnbRetailCameraQuaternionBasis.cs" Link="EnbRetailCameraQuaternionBasis.cs" />
+    <InternalsVisibleTo Include="EnbNext.Rendering" />
+    <InternalsVisibleTo Include="EnbNext.Net7" />
+    <InternalsVisibleTo Include="EnbNext.Net7.Tests" />
+
+<InternalsVisibleTo Include="EnbNext.TestSupport" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net10.0</TargetFramework><AllowUnsafeBlocks>true</AllowUnsafeBlocks><IsPackable>false</IsPackable><IsTestProject>false</IsTestProject></PropertyGroup>
+  <ItemGroup><PackageReference Include="xunit" Version="2.9.2" /><InternalsVisibleTo Include="EnbNext.Net7.Tests" /></ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\EnbNext.Assets\EnbNext.Assets.csproj" />
+    <ProjectReference Include="..\..\src\EnbNext.Net7\EnbNext.Net7.csproj" />
+    <ProjectReference Include="..\..\src\EnbNext.Presentation\EnbNext.Presentation.csproj" />
+    <ProjectReference Include="..\..\src\EnbNext.Rendering\EnbNext.Rendering.csproj" />
+    <ProjectReference Include="..\..\src\EnbNext.Rendering.OpenGL\EnbNext.Rendering.OpenGL.csproj" />
+    <ProjectReference Include="..\..\src\EnbNext.Client\EnbNext.Client.csproj" />
+    <ProjectReference Include="..\..\src\EnbNext.Engine\EnbNext.Engine.csproj" />
+  </ItemGroup>
+</Project>

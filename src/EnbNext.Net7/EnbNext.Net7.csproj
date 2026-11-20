@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>EnbNext.Net7</RootNamespace>
+    <AssemblyName>EnbNext.Net7</AssemblyName>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EnbNext.Protocol\EnbNext.Protocol.csproj" />
+    <ProjectReference Include="..\EnbNext.RetailMath\EnbNext.RetailMath.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="World\Schemas\*.csv" />
+  </ItemGroup>
+  <ItemGroup><ProjectReference Include="../EnbNext.Installation/EnbNext.Installation.csproj" /></ItemGroup>
+</Project>

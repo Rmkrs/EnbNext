@@ -1,0 +1,7 @@
+# Retail mesh admission oracle
+
+`retail-mesh-frustum.bin` contains 4096 controls executed on native Windows x86/x87 hardware using the retail function at008E2000 (323 bytes). Input executable SHA256:249f852496f341c00361be95b66e7c0becc2c39e7c0becc2c39e7cba026f9227e38b602651c4. Only its three absolute references to epsilon00B0C9C8 were relocated; epsilon is float word358637BD. No source implementation or GPL code supplies expected results.
+
+Each 128-byte little-endian record contains a uint precision selector (0=PC24,1=PC53), six float4 planes, float3 box center, float3 box extent, and uint outside result (native return1). First2048 cases use control word007F; remaining2048 use027F. The deterministic xorshift seed is008E2000. Cases include arbitrary finite planes/boxes, epsilon neighbors, negative zero and NaN. Existing independently emulated camera/frustum and world-bounds fixtures cover008DD7A0 and008C2F30 separately.
+
+Production admission is0093F416..0093F44B: update active camera, bypass internal model flag0400, read virtual+F4 world box, call008E2000 with camera+C8, return when outside. This is before lazy model registration0093F46C. Static-sort diversion precedes this block. Projected decals and generated geometry use their separate consumers. Offscreen mapper evaluations are deliberately absent; the old Next path called them despite rejection by retail, affecting later shared clock rounding. Do not add those calls back merely to reproduce old Next pixel hashes.

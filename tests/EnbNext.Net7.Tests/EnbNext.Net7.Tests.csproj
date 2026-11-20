@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <RootNamespace>EnbNext.Net7.Tests</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\src\EnbNext.App\StartupLogin.cs" Link="StartupLogin.cs" />
+    <Compile Include="..\..\src\EnbNext.App\SavedAccountStore.cs" Link="SavedAccountStore.cs" />
+    <Compile Include="..\..\src\EnbNext.App\SavedGroupStore.cs" Link="SavedGroupStore.cs" />
+    <Compile Include="..\..\src\EnbNext.App\GroupLaunchSession.cs" Link="GroupLaunchSession.cs" />
+    <Compile Include="..\..\src\EnbNext.App\AccountSecretStore.cs" Link="AccountSecretStore.cs" />
+    <Compile Include="..\..\src\EnbNext.App\Net7SiteAccounts.cs" Link="Net7SiteAccounts.cs" />
+    <Compile Include="..\..\src\EnbNext.App\MultiboxPeer.cs" Link="MultiboxPeer.cs" />
+    <Compile Include="..\..\src\EnbNext.App\MultiboxPeer.Shortcuts.cs" Link="MultiboxPeer.Shortcuts.cs" />
+    <Compile Include="..\..\src\EnbNext.App\MultiboxPeer.Combat.cs" Link="MultiboxPeer.Combat.cs" />
+    <Compile Include="..\..\src\EnbNext.App\DiscordPresenceClient.cs" Link="DiscordPresenceClient.cs" />
+    <Compile Include="..\..\src\EnbNext.App\DiscordPresenceActivity.cs" Link="DiscordPresenceActivity.cs" />
+    <Compile Include="..\..\src\EnbNext.App\LoginFailureFeedback.cs" Link="LoginFailureFeedback.cs" />
+    <Compile Include="..\..\src\EnbNext.App\StartupMovieCapture.cs" Link="StartupMovieCapture.cs" />
+    <Compile Include="..\..\src\EnbNext.App\EnbStartupPreferences.cs" Link="EnbStartupPreferences.cs" />
+    <Compile Include="..\..\src\EnbNext.App\EnbCharacterDisplayPreferences.cs" Link="EnbCharacterDisplayPreferences.cs" />
+    <Compile Include="..\..\src\EnbNext.App\SessionDiagnosticLog.cs" Link="SessionDiagnosticLog.cs" />
+    <ProjectReference Include="..\..\src\EnbNext.Assets\EnbNext.Assets.csproj" />
+    <ProjectReference Include="..\..\src\EnbNext.Net7\EnbNext.Net7.csproj" />
+    <ProjectReference Include="..\..\src\EnbNext.Presentation\EnbNext.Presentation.csproj" />
+    <ProjectReference Include="..\..\src\EnbNext.Rendering\EnbNext.Rendering.csproj" />
+    <ProjectReference Include="..\..\src\EnbNext.Rendering.OpenGL\EnbNext.Rendering.OpenGL.csproj" />
+    <ProjectReference Include="..\..\src\EnbNext.Client\EnbNext.Client.csproj" />
+    <ProjectReference Include="..\..\src\EnbNext.Engine\EnbNext.Engine.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup><ProjectReference Include="../EnbNext.TestSupport/EnbNext.TestSupport.csproj" /></ItemGroup>
+  <ItemGroup></ItemGroup>
+</Project>

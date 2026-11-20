@@ -1,0 +1,1 @@
+global using EnbRslObjectState=EnbNext.Rendering.EnbCurrentRetailEffectRslObjectRuntime.ObjectState;
