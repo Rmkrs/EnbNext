@@ -126,7 +126,7 @@ internal sealed partial class EnbWorldUi
             string name = stats?.GetValueOrDefault("Name") is { Length: > 0 } owner ? owner : local.PlayerPresentation?.Owner ?? "";
             int level = Stat("CombatLevel") + Stat("ExploreLevel") + Stat("TradeLevel");
             self = new(name, stats is null ? null : level, new(1, .82f, .35f), cockpit.Vitals, cockpit.EnergyPercent, cockpit.MaximumEnergyPower,
-                local.Avatar, Inventory.PortraitPoseFor(local.RenderIdentity), local.RenderIdentity);
+                local.Avatar, Inventory.PortraitPoseFor(local.RenderIdentity), local.RenderIdentity, Rank: stats?.GetValueOrDefault("Rank"));
         }
         // Next multibox "Shared harvesting": followers that can harvest the targeted asteroid lend its level, its contents
         // and each its own Harvest button (its name in the tooltip) to this client's target frame.
@@ -155,7 +155,7 @@ internal sealed partial class EnbWorldUi
         var experience = scene.Hud.Experience;
         var warp = scene.Hud.Cockpit?.Warp?.IsEngaged == true;
         var status = new EnbModernStatus(local is null ? null : Cockpit.SpeedText(local.Spatial?.Transform), warp,
-            experience.Combat, experience.Explore, experience.Trade, Stat("CombatLevel"), Stat("ExploreLevel"), Stat("TradeLevel"), harvest);
+            experience.Combat, experience.Explore, experience.Trade, Stat("CombatLevel"), Stat("ExploreLevel"), Stat("TradeLevel"), harvest, Stat("XPDebt"));
         ModernHud.Update(self, selected, verbs, readout, scene.Environment, status, scene.Hud.Buffs, scene.Hud.TargetBuffs, scene.ClientTime, station ? null : Scanner.ModernCast);
         ModernHud.UpdateGroup(Inventory.ModernGroupMembers, scene.Objects, Inventory.ModernFormationReady);
         ModernHud.UpdateConnection();

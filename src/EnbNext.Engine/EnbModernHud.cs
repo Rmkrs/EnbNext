@@ -10,14 +10,16 @@ namespace EnbNext.Engine;
 /// <summary>One unit frame's values (player or target) as the Modern UI shows them.</summary>
 internal readonly record struct EnbModernUnit(string Name, int? Level, EnbRgb NameColor,
     IEnbVitalsFrame? Vitals, float? EnergyPercent, float? EnergyMaximum,
-    EnbSceneAvatarSnapshot? Avatar, EnbAvatarPortraitAsset? Pose, ulong Identity, string? Assessment = null);
+    EnbSceneAvatarSnapshot? Avatar, EnbAvatarPortraitAsset? Pose, ulong Identity, string? Assessment = null, string? Rank = null);
 
-/// <summary>Player status the Modern UI shows: speed, warp, experience progress and levels, and a targeted asteroid's contents.</summary>
+/// <summary>Player status the Modern UI shows: speed, warp, experience progress and levels, experience debt (as in the
+/// retail biography) and a targeted asteroid's contents.</summary>
 internal readonly record struct EnbModernStatus(string? Speed, bool Warp, float CombatXp, float ExploreXp, float TradeXp,
-    int CombatLevel, int ExploreLevel, int TradeLevel, ImmutableArray<string> Harvest)
+    int CombatLevel, int ExploreLevel, int TradeLevel, ImmutableArray<string> Harvest, int XpDebt = 0)
 {
     public bool Equals(EnbModernStatus other) => Speed == other.Speed && Warp == other.Warp && CombatXp == other.CombatXp && ExploreXp == other.ExploreXp &&
-        TradeXp == other.TradeXp && CombatLevel == other.CombatLevel && ExploreLevel == other.ExploreLevel && TradeLevel == other.TradeLevel && SameLines(Harvest, other.Harvest);
+        TradeXp == other.TradeXp && CombatLevel == other.CombatLevel && ExploreLevel == other.ExploreLevel && TradeLevel == other.TradeLevel && SameLines(Harvest, other.Harvest) &&
+        XpDebt == other.XpDebt;
     public static bool SameLines(ImmutableArray<string> a, ImmutableArray<string> b) => a.IsDefaultOrEmpty ? b.IsDefaultOrEmpty : !b.IsDefaultOrEmpty && a.SequenceEqual(b);
     public override int GetHashCode() => HashCode.Combine(Speed, Warp, CombatXp, ExploreXp, TradeXp);
 }
@@ -81,6 +83,8 @@ internal sealed partial class EnbModernHud(EnbRetailAssetBundle assets) : IDispo
     private long gaugeTime = Environment.TickCount64;
     private EnbUiPoint pointer = new(-100000, -100000);
     private string? hovered;
+    /// <summary>The verb button held down by a left press (key and verb value); it runs on release over it.</summary>
+    private (string Key, uint Verb)? pressedVerb;
     private EnbUiTooltipDraw? cachedTooltip;
     /// <summary>The text the cached tooltip shows: a gauge tooltip follows its live value while it stays hovered.</summary>
     private string? cachedTooltipText;
@@ -449,7 +453,9 @@ internal sealed partial class EnbModernHud(EnbRetailAssetBundle assets) : IDispo
             {
                 double lw = levelText is null ? 0 : Measure(levelText, small, true) + 7;
                 var nameRect = line with { X = line.X + lw, Width = line.Width - lw };
-                Text(Fit(unit.Name, nameRect.Width, small, true), nameRect, unit.NameColor, group, small, false, large: true);
+                // The player's rank (as in the retail biography) stands between the level and the name.
+                string shown = string.IsNullOrWhiteSpace(unit.Rank) ? unit.Name : unit.Rank.Trim() + " " + unit.Name;
+                Text(Fit(shown, nameRect.Width, small, true), nameRect, unit.NameColor, group, small, false, large: true);
                 if (levelText is not null) Text(levelText, line with { Width = lw - 7 }, new(1, .93f, .55f), group, small, false, large: true);
             }
         }
@@ -521,7 +527,7 @@ internal sealed partial class EnbModernHud(EnbRetailAssetBundle assets) : IDispo
                 double rowWidth = inRow * size + (inRow - 1) * VerbGap, x0 = rowWidth > lining.Width ? lining.X : lining.Center.X - rowWidth / 2;
                 var v = verbs[i]; var rect = new EnbUiRect(x0 + n % 2 * (size + VerbGap), lining.Bottom + 3 + n / 2 * (size + VerbGap), size, size); n++;
                 edge = Math.Max(edge, rect.Right);
-                draws.Add(new(v.Asset, v.Value, rect, hovered == "verb/" + i) { LayoutGroup = group });
+                draws.Add(new(v.Asset, v.Value, rect, hovered == "verb/" + i) { LayoutGroup = group, EmissiveOverride = Held("verb/" + i) });
                 hits.Add(("verb/" + i, rect, group));
             }
             return edge;
@@ -537,7 +543,7 @@ internal sealed partial class EnbModernHud(EnbRetailAssetBundle assets) : IDispo
             if (follow >= 0)
             {
                 var v = verbs[follow];
-                draws.Add(new(v.Asset, v.Value, cell, hovered == "verb/" + follow) { LayoutGroup = group });
+                draws.Add(new(v.Asset, v.Value, cell, hovered == "verb/" + follow) { LayoutGroup = group, EmissiveOverride = Held("verb/" + follow) });
                 hits.Add(("verb/" + follow, cell, group));
             }
             else if (FollowAsset() is { } idle) { draws.Add(new(idle, FollowKind | 1, cell, false) { LayoutGroup = group }); hits.Add(("follow", cell, group)); }
@@ -776,6 +782,21 @@ internal sealed partial class EnbModernHud(EnbRetailAssetBundle assets) : IDispo
         else ScannerHovered?.Invoke(null, 0, screen);
     }
 
+    /// <summary>
+    /// Releases a held verb button: the verb runs when the release is over the same button (0066B910). While held, the
+    /// button shows pressed (0066C860's .35 colour) only while the pointer is over it (0066B840).
+    /// </summary>
+    public bool Release(EnbUiPoint screen)
+    {
+        if (pressedVerb is not { } held) return false;
+        var (key, verb) = held; pressedVerb = null; cached = null;
+        if (hovered == key && HitAt(screen) == key && int.Parse(key.AsSpan(5), CultureInfo.InvariantCulture) is int i && i < verbs.Length &&
+            verbs[i].Value == verb && verbs[i].Executable) VerbPressed?.Invoke(verbs[i]);
+        return true;
+    }
+
+    private System.Numerics.Vector3? Held(string key) => pressedVerb?.Key == key && hovered == key ? new System.Numerics.Vector3(.35f) : null;
+
     /// <summary>Next "Right-click on target to cancel targeting" (Quality of Life, off by default).</summary>
     internal bool RightClickCancelsTarget { get; set; }
 
@@ -819,7 +840,9 @@ internal sealed partial class EnbModernHud(EnbRetailAssetBundle assets) : IDispo
         else if (key == "hud/SHIP_BUT" && EquipmentRequested is { } equipment) equipment();
         else if (key.StartsWith("hud/", StringComparison.Ordinal)) UtilityRequested?.Invoke(key);
         else if (key == "cycle/prev" || key == "cycle/next") CycleRequested?.Invoke(key == "cycle/prev");
-        else if (key.StartsWith("verb/", StringComparison.Ordinal) && int.Parse(key.AsSpan(5), CultureInfo.InvariantCulture) is int i && i < verbs.Length && verbs[i].Executable) VerbPressed?.Invoke(verbs[i]);
+        // As the retail verb buttons (0066B910): a press holds the button down; the verb runs on release (Release).
+        else if (key.StartsWith("verb/", StringComparison.Ordinal) && int.Parse(key.AsSpan(5), CultureInfo.InvariantCulture) is int i && i < verbs.Length && verbs[i].Executable)
+        { pressedVerb = (key, verbs[i].Value); cached = null; }
         else if (key.StartsWith("player", StringComparison.Ordinal)) TargetSelfRequested?.Invoke();
         return true;
     }
@@ -870,7 +893,11 @@ internal sealed partial class EnbModernHud(EnbRetailAssetBundle assets) : IDispo
     /// <summary>Target portrait tooltip: a prospected asteroid's contents (the ETA stands beside the distance).</summary>
     private string? TargetTip() => status.Harvest.IsDefaultOrEmpty ? null : string.Join("\n", status.Harvest);
 
-    private string Experience(int kind)
+    internal static string DebtLine(int debt) => "XP Debt: " + debt.ToString("N0", CultureInfo.InvariantCulture);
+
+    private string Experience(int kind) => ExperienceText(kind) + (status.XpDebt > 0 ? "\n" + DebtLine(status.XpDebt) : "");
+
+    private string ExperienceText(int kind)
     {
         var (label, level, value) = kind switch { 0 => ("Combat", status.CombatLevel, status.CombatXp), 1 => ("Exploration", status.ExploreLevel, status.ExploreXp), _ => ("Trade", status.TradeLevel, status.TradeXp) };
         // The server sends the step fraction; the Net-7 step sizes give the experience values.

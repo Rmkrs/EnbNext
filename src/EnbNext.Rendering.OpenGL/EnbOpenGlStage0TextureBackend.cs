@@ -1130,7 +1130,7 @@ public sealed partial class EnbOpenGlStage0TextureBackend
         _materialApplication.ResetCounters();
     }
     public string SubmissionTiming => !MeasureSubmissionStages ? "" :
-        " � submit stages setup/uniform/state/mapper/mapper-uniform/texture/draw/cleanup ms " +
+        " · submit stages setup/uniform/state/mapper/mapper-uniform/texture/draw/cleanup ms " +
         string.Join("/",_submissionTicks.Select(t=>(t*1000d/Stopwatch.Frequency).ToString("0.000",System.Globalization.CultureInfo.InvariantCulture)));
     private void SubmissionStage(int index,ref long last)
     {

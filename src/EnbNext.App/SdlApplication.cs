@@ -153,7 +153,8 @@ internal sealed partial class SdlApplication
                     else frontendScreen?.Tick();
                 }
                 ticked=Stopwatch.GetTimestamp();
-                diagnostics.Resize(window.Size);diagnostics.IssueCount=_runtimeIssues.Count;diagnostics.Tick();
+                // The issues badge is a development aid, shown only when diagnostic files are written (--logs).
+                diagnostics.Resize(window.Size);diagnostics.IssueCount=DiagnosticFiles.Enabled?_runtimeIssues.Count:0;diagnostics.Tick();
                 if(now>=nextDiagnostics){nextDiagnostics=now+2000;SavePresentationDiagnostics();SavePreferences();}
                 if(!window.Minimized)
                 {

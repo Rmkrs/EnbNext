@@ -196,6 +196,8 @@ internal sealed partial class SdlApplication
     {
         if (worldScreen is not { } world || world.Owner.Ui.ModernHud is not { } hud || world.Owner.Ui.Layout.Editing) return false;
         var type = (SDL_EventType)e.type;
+        // A held verb button lets up wherever the left button is released (it runs only over the button).
+        if (type == SDL_EventType.SDL_EVENT_MOUSE_BUTTON_UP && e.button.button == 1 && hud.Release(new(e.button.x, e.button.y))) return true;
         if (PointerUnderGameUi(world, e)) { if (type == SDL_EventType.SDL_EVENT_MOUSE_MOTION) hud.Pointer(new(-100000, -100000)); return false; }
         if (type == SDL_EventType.SDL_EVENT_MOUSE_MOTION) { var p = new EnbUiPoint(e.motion.x, e.motion.y); hud.Pointer(p); return hud.Contains(p); }
         if (type == SDL_EventType.SDL_EVENT_MOUSE_BUTTON_DOWN) return e.button.button is 1 or 3 && hud.Press(new(e.button.x, e.button.y), e.button.button == 3);

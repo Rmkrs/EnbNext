@@ -267,6 +267,19 @@ internal sealed partial class EnbNavigationMapUi : IDisposable
     private Point Design(Point p){p=UiLayout?.Inverse(EnbUiGroup.Map,p)??p;return new(p.X*640/_size.Width,p.Y*480/_size.Height);}
     private static double Distance(Point a,Point b)=>Math.Sqrt((a.X-b.X)*(a.X-b.X)+(a.Y-b.Y)*(a.Y-b.Y));
     private Point Logical(Point p)=>new(p.X*_size.Width/640,p.Y*_size.Height/480);
+
+    /// <summary>
+    /// Next Modern UI: a marker's name label stays inside the map. Beside an edge it moves inward; above the top edge it
+    /// goes under its marker instead. The map itself (zoom and position) is not changed for it.
+    /// </summary>
+    private Rect KeepLabelInView(Rect label,double markerBottom)
+    {
+        var area=Logical(Content);
+        double x=Math.Clamp(label.X,area.X,Math.Max(area.X,area.Right-label.Width));
+        double y=label.Y<area.Y ? markerBottom : label.Y;
+        y=Math.Clamp(y,area.Y,Math.Max(area.Y,area.Bottom-label.Height));
+        return new(x,y,label.Width,label.Height);
+    }
     private Rect Logical(Rect r)=>new(Logical(r.TopLeft),Logical(r.BottomRight));
     private Vector2 Viewport=>new((float)Content.Width,(float)Content.Height);
     private Vector3 WorldAt(Point logical)
@@ -571,7 +584,10 @@ internal sealed partial class EnbNavigationMapUi : IDisposable
                 if(Guidance.Gate==obj.GameId) name+=" [Route]";
                 AddText("object:"+obj.GameId,name,"FONT_TINY",Logical(new Point(point.X,point.Y-radius)),labelColor,true,true,opacity);
                 if (_text.TryGetValue("object:"+obj.GameId,out var label) && label.Raster is not null && !string.IsNullOrEmpty(name))
+                {
+                    if (_modern) contentImages[^1]=contentImages[^1] with { Bounds=KeepLabelInView(contentImages[^1].Bounds,Logical(new Point(point.X,point.Y+radius)).Y) };
                     _labelBounds[obj.GameId]=(contentImages[^1].Bounds);
+                }
             }
         }
         PublishNotes(images,contentImages,AddText);

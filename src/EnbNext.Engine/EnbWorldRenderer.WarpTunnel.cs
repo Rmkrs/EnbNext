@@ -238,8 +238,8 @@ internal sealed partial class EnbWorldRenderer
             }
             catch(InvalidDataException error){blocked++;failure??=error.Message;}
         }
-        _warpTunnelStatus=$"warp tunnel draws {draws} pending {_warpTunnelPending} blocked {blocked}"+(failure is null?"":" � "+failure);
-        _effectObjectVisualStatus+=" � "+_warpTunnelStatus;
+        _warpTunnelStatus=$"warp tunnel draws {draws} pending {_warpTunnelPending} blocked {blocked}"+(failure is null?"":" · "+failure);
+        _effectObjectVisualStatus+=" · "+_warpTunnelStatus;
     }
     private sealed class TunnelParticle(EnbCurrentRetailRObjParticleAsset asset,uint clock)
     {

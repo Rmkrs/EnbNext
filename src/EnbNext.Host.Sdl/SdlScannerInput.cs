@@ -21,7 +21,7 @@ internal sealed class SdlScannerInput : IDisposable
         if(owner.VerbsVisible)for(int i=0;i<owner.Verbs.Count;i++)if(VerbHit(i).Contains(point))return true;
         return false;
     }
-    internal void Clear(){owner.ClearVerbHover();owner.PublishVerbs();owner.HideScannerTooltip();}
+    internal void Clear(){owner.ReleaseVerb();owner.ClearVerbHover();owner.PublishVerbs();owner.HideScannerTooltip();}
     internal async Task<bool> Handle(SDL_Event e)
     {
         var type=(SDL_EventType)e.type;
@@ -35,18 +35,26 @@ internal sealed class SdlScannerInput : IDisposable
             if(y==0)return true;
             owner.WheelArrow(y>0,((uint)SDL_GetModState()&SDL_KMOD_ALT)!=0);return true;
         }
-        bool move=type==SDL_EventType.SDL_EVENT_MOUSE_MOTION,press=type==SDL_EventType.SDL_EVENT_MOUSE_BUTTON_DOWN;
-        if(!move&&!press)return false;
+        bool move=type==SDL_EventType.SDL_EVENT_MOUSE_MOTION,press=type==SDL_EventType.SDL_EVENT_MOUSE_BUTTON_DOWN,release=type==SDL_EventType.SDL_EVENT_MOUSE_BUTTON_UP;
+        if(!move&&!press&&!release)return false;
         var point=move?new EnbUiPoint(e.motion.x,e.motion.y):new EnbUiPoint(e.button.x,e.button.y);
-        int button=press?(e.button.button==SDL_BUTTON_LEFT?1:e.button.button==SDL_BUTTON_RIGHT?2:0):0;
+        int button=press||release?(e.button.button==SDL_BUTTON_LEFT?1:e.button.button==SDL_BUTTON_RIGHT?2:0):0;
+        if(release)
+        {
+            // A held verb button runs on release over it (0066B910); any other release is not the scanner's.
+            if(button!=1||owner.ReleaseVerb() is not uint released)return false;
+            if(owner.VerbsVisible)for(int i=0;i<owner.Verbs.Count;i++)
+                if(owner.Verbs[i].Value==released&&owner.Verbs[i].Executable&&VerbHit(i).Contains(point)){var held=owner.Verbs[i];await owner.ExecuteVerbSafelyAsync(held.TargetId,held.Value);break;}
+            return true;
+        }
         if(owner.VerbsVisible)
             for(int i=0;i<owner.Verbs.Count;i++)if(VerbHit(i).Contains(point))
             {
-                var verb=owner.Verbs[i];if(move)owner.HoverVerb(verb.Value,point);
-                if(button==1&&verb.Executable){await owner.ExecuteVerbSafelyAsync(verb.TargetId,verb.Value);return true;}
+                var verb=owner.Verbs[i];if(move){owner.HoverVerb(verb.Value,point);owner.TrackPressedVerb(verb.Value);}
+                if(button==1&&verb.Executable){owner.PressVerb(verb.Value);return true;}
                 return false;
             }
-        if(move){owner.ClearVerbHover();owner.PublishVerbs();}
+        if(move){owner.TrackPressedVerb(null);owner.ClearVerbHover();owner.PublishVerbs();}
         var panel=owner.PanelBounds;if(!panel.Contains(point)){if(move)owner.HideScannerTooltip();return false;}
         var local=Local(point);int kind=0;
         if(new EnbUiRect(95,120,17,18).Contains(local))kind=1;

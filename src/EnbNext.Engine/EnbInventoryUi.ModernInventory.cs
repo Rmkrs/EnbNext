@@ -212,9 +212,11 @@ internal sealed partial class EnbInventoryUi
         }
         Flush();
         cy += rows * slot + (rows - 1) * gap + gap;
-        // Bottom row: credits left, slot use right.
+        // Bottom row: credits left, experience debt (when there is any, as in the retail biography) centred, slot use right.
         var bottomRow = new Rect(cx, cy, content, row);
         ModernText("minv/credits", "Credits: " + (data?.Credits ?? 0).ToString("N0", CultureInfo.InvariantCulture), bottomRow, new(1, 1, 1), text);
+        if (int.TryParse(data?.CharacterStats.GetValueOrDefault("XPDebt", ""), NumberStyles.Integer, CultureInfo.InvariantCulture, out int debt) && debt > 0)
+            ModernText("minv/debt", EnbModernHud.DebtLine(debt), bottomRow, new(1, .55f, .4f), text, 1);
         string usage = used.ToString(CultureInfo.InvariantCulture) + " / " + keys.Length.ToString(CultureInfo.InvariantCulture) + " slots";
         ModernText("minv/usage", usage, bottomRow, used >= keys.Length && keys.Length > 0 ? new(1, .55f, .4f) : new(.7f, .75f, .85f), text, 2);
         if (_message is not null && _terminal is null) ModernText("minv/message", _message, new(cx, cy - row - gap, content, row), new(1, .4f, .4f), text, 1);
@@ -321,7 +323,7 @@ internal sealed partial class EnbInventoryUi
         for (int i = 0; i < EnbItemInformation.Filters.Length; i++) filterWidth = Math.Max(filterWidth, ModernMeasure(FilterLabel(i), text));
         for (int mode = 0; mode < 3; mode++) sortWidth = Math.Max(sortWidth, ModernMeasure(SortLabel(mode), text));
         filterWidth += buttonPad * 2; sortWidth += buttonPad * 2;
-        double footer = ModernMeasure("Credits: 9,999,999,999", text) + ModernMeasure("99 / 99 slots", text) + 24 * u;
+        double footer = ModernMeasure("Credits: 9,999,999,999", text) + ModernMeasure(EnbModernHud.DebtLine(999_999), text) + ModernMeasure("99 / 99 slots", text) + 48 * u;
         double content = Math.Max(Math.Max(columns * 46 * u + (columns - 1) * gap, 140 * u + filterWidth + sortWidth + gap * 2), footer);
         double slot = Math.Floor((content - (columns - 1) * gap) / columns);
         return (columns, rows, slot, columns * slot + (columns - 1) * gap, filterWidth, sortWidth);

@@ -80,9 +80,7 @@ internal sealed class EnbScannerUi
         {
             if (!await _verbExecutor(targetId, verb, CancellationToken.None))
                 VerbExecutionError = "Target action was not sent (target or session is no longer ready).";
-            else if (verb is 0x00040000 or 0x00060000 or 0x000A0000)
-                // 00658430: group/trade cue at 00658A70; gate cue at 00658850.
-                InteractionSoundRequested?.Invoke("SR_scifielectronic40.wav");
+            else if (VerbSound(verb, targetId) is { } sound) InteractionSoundRequested?.Invoke(sound);
         }
         catch (Exception ex)
         {
@@ -803,6 +801,40 @@ internal sealed class EnbScannerUi
         ShowRetailTooltip(100 + (int)(verb >> 16), pointer);
     }
 
+    /// <summary>
+    /// 00658430: every verb that queues its request ends at 00658A70 with SR_scifielectronic40.wav (Gate plays the same
+    /// cue on its own branch); Message plays message_1.wav. Dock and Land return without it, and Follow on the own ship
+    /// only reports "Cannot autofollow self.".
+    /// </summary>
+    private string? VerbSound(uint verb, uint targetId) => (verb & 0xFFFF0000u) switch
+    {
+        0x00020000 or 0x00080000 => null,
+        0x00050000 => "message_1.wav",
+        0x000D0000 when _snapshot?.Objects.FirstOrDefault(o => o.IsLocalShip)?.GameId == targetId => null,
+        _ => "SR_scifielectronic40.wav",
+    };
+
+    private uint? _pressedVerb;
+    private bool _pressedInside;
+
+    /// <summary>
+    /// 0066B910: a left press holds a verb button down (0066C2D0 gives its model 0066C860's .35 colour) and the verb runs
+    /// on release over it; while held, leaving the button lets it up and coming back pushes it down again (0066B840).
+    /// </summary>
+    internal void PressVerb(uint verb) { _pressedVerb = verb; _pressedInside = true; PublishVerbs(); }
+    internal void TrackPressedVerb(uint? over)
+    {
+        if (_pressedVerb is null || (over == _pressedVerb) == _pressedInside) return;
+        _pressedInside = over == _pressedVerb; PublishVerbs();
+    }
+    /// <summary>Lets the held verb button up; returns the verb when the release was over it.</summary>
+    internal uint? ReleaseVerb()
+    {
+        if (_pressedVerb is not { } verb) return null;
+        bool inside = _pressedInside; _pressedVerb = null; _pressedInside = false; PublishVerbs();
+        return inside ? verb : null;
+    }
+
     internal void ClearVerbHover()
     {
         _hoveredVerb = null;
@@ -814,7 +846,8 @@ internal sealed class EnbScannerUi
         var buttons=ImmutableList.CreateBuilder<EnbUiModelDraw>();
         if(IsVisible&&_verbsVisible&&!Replaced)
             foreach(var button in Verbs)
-                buttons.Add(new(button.Asset,button.Value,button.Bounds,_hoveredVerb==button.Value){LayoutGroup=EnbUiGroup.Scanner,GadgetOwner=button});
+                buttons.Add(new(button.Asset,button.Value,button.Bounds,_hoveredVerb==button.Value){LayoutGroup=EnbUiGroup.Scanner,GadgetOwner=button,
+                    EmissiveOverride=_pressedInside&&_pressedVerb==button.Value?new System.Numerics.Vector3(.35f):null});
         VerbPresentationChanged?.Invoke(buttons.ToImmutable());
     }
 
