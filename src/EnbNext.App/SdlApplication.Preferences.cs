@@ -67,6 +67,9 @@ internal sealed partial class SdlApplication
     }
     private void HandleDisplayEvent(SDL_EventType type)
     {
+        // A moved or resized window holds the loop for a moment: no lag is judged meanwhile.
+        if(type is SDL_EventType.SDL_EVENT_WINDOW_MOVED or SDL_EventType.SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED or SDL_EventType.SDL_EVENT_WINDOW_DISPLAY_CHANGED or SDL_EventType.SDL_EVENT_WINDOW_DISPLAY_SCALE_CHANGED)
+            lagMonitor.Hold(ForegroundSettle);
         if(type is SDL_EventType.SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED or SDL_EventType.SDL_EVENT_WINDOW_DISPLAY_SCALE_CHANGED)
         {window.RefreshSize();cursor?.SetScale(window.Scale);frontendScreen?.Resize();worldScreen?.Resize();}
         // Focus mode places windows temporarily; their saved placement stays as it was.

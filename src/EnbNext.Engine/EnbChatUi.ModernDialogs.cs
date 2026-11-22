@@ -418,7 +418,7 @@ internal sealed partial class EnbChatUi
         string title = "Reply to";
         double width = Math.Ceiling(Math.Max(Math.Round(160 * u), Math.Max(MdMeasure(title, text), data.RecentPeers.Max(p => MdMeasure(p, text))) + pad * 2 + 24 * u));
         double height = Math.Round(pad * 2 + head + data.RecentPeers.Length * rowHeight);
-        var panel = ModernChatArea;
+        var panel = _modernWindows.Count > 0 ? _modernWindows[0].Bounds : ModernChatArea;
         var window = new Rect(MdSnap(panel.X), MdSnap(Math.Max(0, panel.Y - height - 4 * u)), width, height);
         Hit("replypopup/frame", window, () => { }, group: EnbUiGroup.None);
         MdFrame(frames, 0, window, "replypopup/frame");

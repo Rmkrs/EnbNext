@@ -11,13 +11,21 @@ internal sealed partial class EnbGraphicsSettingsState
     public bool UiScaleDropdown {get;set;}
     public bool TextureDropdown {get;set;}
     public string?[] TexturePacks {get;set;}=[""];
+    public (string? Key,string Label)[] Adapters {get;set;}=[];
+    public string? Adapter {get;set;}
+    public string? OriginalAdapter {get;set;}
+    public bool AdapterDropdown {get;set;}
+    public Func<string?,bool>? AdapterAtRestart {get;set;}
+    /// <summary>The chosen card (Automatic when the saved card is gone); a choice that waits for the next start says so.</summary>
+    public int AdapterIndex=>Math.Max(0,Array.FindIndex(Adapters,a=>a.Key==Adapter));
+    public string AdapterLabel=>Adapters.Length==0?"":Adapters[AdapterIndex].Label+(AdapterAtRestart?.Invoke(Adapter)==true?" (after restart)":"");
     public static string TextureLabel(string? name)=>name is null?"Legacy pack":name.Length==0?"Original":name;
     public double? UiScale {get;set;}
     public double SystemScale {get;set;}=1;
     public double?[] UiScales {get;set;}=[null,1,1.25,1.5,1.75,2];
     public string ScaleLabel(double? value)=>value is {} number?$"{number*100:0}%":$"System ({SystemScale*100:0}%)";
-    public bool Dropdown=>ResolutionDropdown||UiScaleDropdown||TextureDropdown;
-    public int ChoiceCount=>TextureDropdown?TexturePacks.Length:UiScaleDropdown?UiScales.Length:DisplayChoices.Count;
+    public bool Dropdown=>ResolutionDropdown||UiScaleDropdown||TextureDropdown||AdapterDropdown;
+    public int ChoiceCount=>AdapterDropdown?Adapters.Length:TextureDropdown?TexturePacks.Length:UiScaleDropdown?UiScales.Length:DisplayChoices.Count;
 
     public void OpenDisplay(Action? begin, Func<EnbDisplayScope>? scope,
         Func<EnbDisplayChoice>? current, Func<IReadOnlyList<EnbDisplayChoice>>? choices)

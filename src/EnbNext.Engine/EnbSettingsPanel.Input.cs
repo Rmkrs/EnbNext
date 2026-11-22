@@ -8,8 +8,8 @@ namespace EnbNext.Engine;
 internal sealed partial class EnbSettingsPanel : IEnbUiGadgetHandler
 {
     private EnbUiGadgetPointer? pointer;
-    // Gadgets: 0 CHECK00, 1..5 sliders, 6..9 buttons, 10 ROUTE, 12.. QOL2..QOL45, then the frame.
-    private const int QolFirst=2,QolCount=44,QolGadgetLast=12+QolCount-1,FrameGadget=QolGadgetLast+1;
+    // Gadgets: 0 CHECK00, 1..5 sliders, 6..9 buttons, 10 ROUTE, 12.. QOL2..QOL47, then the frame.
+    private const int QolFirst=2,QolCount=46,QolGadgetLast=12+QolCount-1,FrameGadget=QolGadgetLast+1;
     public EnbUiGadgetPointer Pointer => pointer ??= new(FrameGadget,1ul | (1ul<<10) | (((1ul<<QolCount)-1)<<12),custom:this);
     private EnbUiPoint inputPoint, normalizedPoint, dragPoint, dragOffset;
     private long inputTime;

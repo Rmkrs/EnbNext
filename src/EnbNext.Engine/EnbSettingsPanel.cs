@@ -101,7 +101,8 @@ internal sealed partial class EnbSettingsPanel(EnbSliderPanelResources resources
     private static readonly NextRow[] NavigationRows=[new("settings/ROUTE",0),new("settings/CHECK00",1),new("settings/QOL45",1),new("settings/QOL2",0),new("settings/QOL14",0),new("settings/QOL15",0),
         new("settings/QOL16",1),new("settings/QOL17",1),new("settings/QOL18",1)];
     private static readonly NextRow[] QualityRows=[new("settings/QOL5",0),new("settings/QOL6",0),new("settings/QOL9",0),new("settings/QOL10",1),new("settings/QOL13",0),new("settings/QOL12",0),
-        new("settings/QOL19",0),new("settings/QOL22",1),new("settings/QOL20",1),new("settings/QOL21",1),new("settings/QOL24",0),new("settings/QOL42",0)];
+        new("settings/QOL19",0),new("settings/QOL22",1),new("settings/QOL20",1),new("settings/QOL21",1),new("settings/QOL24",0),new("settings/QOL42",0),
+        new("settings/QOL46",0),new("settings/QOL47",1)];
     private static readonly NextRow[] ModernRows=[new("settings/QOL23",0),new("settings/QOL25",1),new("settings/QOL36",1),new("settings/QOL37",1),new("settings/QOL38",1),new("settings/QOL39",1),new("settings/QOL40",1),new("settings/QOL41",1),new("settings/QOL43",1),new("settings/QOL44",1)];
     // Labels: the switch, then one row per label category (EnbObjectLabels order).
     private static readonly NextRow[] LabelRows=[new("settings/QOL26",0),..Enumerable.Range(0,EnbObjectLabels.Count).Select(i=>new NextRow("settings/QOL"+(27+i),1))];
@@ -127,7 +128,7 @@ internal sealed partial class EnbSettingsPanel(EnbSliderPanelResources resources
     }
     internal bool RowEnabled(string key)=>key switch
     {
-        "settings/CHECK00"=>state.Page!=7 || state.RoutePlanner,"settings/QOL45"=>state.RoutePlanner,"settings/QOL8"=>state.DiscordPresence.Enabled,
+        "settings/CHECK00"=>state.Page!=7 || state.RoutePlanner,"settings/QOL45"=>state.RoutePlanner,"settings/QOL47"=>state.QualityOfLife.LagReports,"settings/QOL8"=>state.DiscordPresence.Enabled,
         "settings/QOL10" or "settings/QOL11"=>state.Multibox.EnableDamageMeter,
         "settings/QOL16" or "settings/QOL17" or "settings/QOL18"=>state.QualityOfLife.WaypointArrow,
         "settings/QOL20" or "settings/QOL21" or "settings/QOL22"=>state.QualityOfLife.MissionTracker,
@@ -138,7 +139,7 @@ internal sealed partial class EnbSettingsPanel(EnbSliderPanelResources resources
     private static int LabelCategory(string key)=>key.StartsWith("settings/QOL",StringComparison.Ordinal)&&int.TryParse(key.AsSpan(12),out int row)&&row>=27&&row<27+EnbObjectLabels.Count?row-27:-1;
     internal string RowText(string key)=>LabelCategory(key) is int label and >=0?EnbObjectLabels.Names[label]:key switch
     {
-        "settings/ROUTE"=>"Enable Route Planner","settings/CHECK00"=>"Enable Auto Pilot","settings/QOL45"=>"Use wormholes in routes","settings/QOL3"=>"Mute audio in background",
+        "settings/ROUTE"=>"Enable Route Planner","settings/CHECK00"=>"Enable Auto Pilot","settings/QOL45"=>"Use wormholes in routes","settings/QOL46"=>"Offer to send lag reports to the developer","settings/QOL47"=>"Send them without asking","settings/QOL3"=>"Mute audio in background",
         "settings/QOL4"=>"Auto-accept group invites","settings/QOL5"=>"Auto-accept trade","settings/QOL6"=>"Auto form up",
         "settings/QOL7"=>"Discord Rich Presence","settings/QOL8"=>"Share character name","settings/QOL9"=>"Enable damage meter",
         "settings/QOL10"=>"Encounter pause ("+state.Multibox.EncounterPauseSeconds+"s)","settings/QOL12"=>"Enable local multiboxing","settings/QOL2"=>"Shade map outside the sector",

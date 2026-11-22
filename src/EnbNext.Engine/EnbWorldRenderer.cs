@@ -631,16 +631,19 @@ internal sealed partial class EnbWorldRenderer
     internal Action<long, long>? FrameTimingObserver { get; set; }
 
     internal void DeinitializeGl(EnbGlApi gl) => ReleaseGpuContext(gl);
+    /// <summary>Presentation moves to another graphics card: every GL object goes, scene state and audio stay, and
+    /// <see cref="InitializeGl"/> on the new context follows.</summary>
+    internal void SuspendGl(EnbGlApi gl) => ReleaseGpuContext(gl, keepAudio: true);
 
     // Null means the driver already destroyed this context. Retain scene state,
     // discard handles and delegates, and never call GL against the lost device.
-    private void ReleaseGpuContext(EnbGlApi? gl)
+    private void ReleaseGpuContext(EnbGlApi? gl, bool keepAudio = false)
     {
         if (_frameQueueContext is { } queueContext) EnbOpenGlFrameQueue.Release(queueContext, gl is null);
         _frameQueueContext = null;
         ReleaseHudProcedures();
         ClearDazzleQueryTasks();
-        CancelFrontendEntryAudio();
+        if (!keepAudio) CancelFrontendEntryAudio();
         _terrainPreparationCancellation?.Cancel();
         _terrainPreparation=null;_terrainKey=null;
         _terrain=null;_terrainDisplacement=null;
@@ -678,7 +681,7 @@ internal sealed partial class EnbWorldRenderer
         Volatile.Write(ref _cadence, LiveFrameCadenceStatus.Waiting);
         // Graphics loss does not destroy the independent audio device/voices.
         // Normal surface teardown retains its existing audio shutdown behavior.
-        if (gl is not null)
+        if (gl is not null && !keepAudio)
         {
             if (_audio is not null) _lastClientAudioStatus = _audio.ClientSoundStatus;
             _audio?.Dispose();

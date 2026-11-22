@@ -29,6 +29,21 @@ internal sealed partial class EnbOptionsUi
         Publish();
     }
 
+    /// <summary>The chosen graphics card could not be used: the card in use is shown again, with the reason.</summary>
+    public void GraphicsAdapterFailed(string reason)
+    {
+        if(_graphicsState is null)return;
+        _graphicsState.Adapter=GraphicsAdapterRequested?.Invoke();
+        if(ModernOptionsOpen){ModernOptionsError=reason;ModernOptionsChanged?.Invoke();}else Error=reason;
+        Publish();
+    }
+
+    private void SelectGraphicsAdapter(int index)
+    {
+        var key=_graphicsState.Adapters[index].Key;if(key==_graphicsState.Adapter)return;
+        _graphicsState.Adapter=key;PreviewGraphicsAdapter?.Invoke(key);Error=null;
+    }
+
     private void ReadUiScale()
     {
         _graphicsState.UiScale=UiScaleRequested?.Invoke();
@@ -55,6 +70,7 @@ internal sealed partial class EnbOptionsUi
         _graphicsState.TextureOverrides=_graphicsState.OriginalTextureOverrides=TextureOverridesRequested?.Invoke();
 
         _graphicsState.TexturePacks=TexturePacksRequested?.Invoke()??[""];_graphicsState.TextureDropdown=false;
+        _graphicsState.Adapters=GraphicsAdaptersRequested?.Invoke()??[];_graphicsState.AdapterAtRestart=GraphicsAdapterAtRestart;_graphicsState.Adapter=_graphicsState.OriginalAdapter=GraphicsAdapterRequested?.Invoke();_graphicsState.AdapterDropdown=false;
         _graphicsState.OpenDisplay(BeginDisplayPreview,CurrentDisplayScopeRequested,CurrentDisplayRequested,DisplayChoicesRequested);
         _graphicsState.BeginPreview();
         ReadUiScale();_graphicsState.UiScaleDropdown=false;
@@ -73,6 +89,15 @@ internal sealed partial class EnbOptionsUi
             _graphicsState.Enhanced=value;PreviewEnhancedGraphics?.Invoke(value);return;
         }
         if(key=="graphics/BGCAP"){_graphicsState.BackgroundCapEnabled=!_graphicsState.BackgroundCapEnabled;return;}
+        if(key=="graphics/ADAPTER")
+        {
+            _graphicsState.AdapterDropdown=!_graphicsState.AdapterDropdown;
+            _graphicsState.TextureDropdown=_graphicsState.UiScaleDropdown=_graphicsState.ResolutionDropdown=false;return;
+        }
+        if(_graphicsState.AdapterDropdown&&key.StartsWith("graphics/choice",StringComparison.Ordinal)&&
+            int.TryParse(key.AsSpan(15),out int adapterIndex)&&adapterIndex>=0&&adapterIndex<_graphicsState.Adapters.Length)
+        { SelectGraphicsAdapter(adapterIndex);_graphicsState.AdapterDropdown=false;return; }
+        _graphicsState.AdapterDropdown=false;
         if(key=="graphics/TEXTUREOVERRIDES")
         {
             _graphicsState.TextureDropdown=!_graphicsState.TextureDropdown;
@@ -136,13 +161,14 @@ internal sealed partial class EnbOptionsUi
         _graphicsState.OriginalEnhanced=_graphicsState.Enhanced;
         CommitDisplayPreview?.Invoke();SaveTextureOverrides?.Invoke(_graphicsState.TextureOverrides);
         _graphicsState.OriginalTextureOverrides=_graphicsState.TextureOverrides;
+        if(_graphicsState.Adapter!=_graphicsState.OriginalAdapter){SaveGraphicsAdapter?.Invoke(_graphicsState.Adapter);_graphicsState.OriginalAdapter=_graphicsState.Adapter;}
         if(_graphicsState.Advanced)SaveBackgroundCap?.Invoke(_graphicsState.BackgroundCapEnabled,_graphicsState.BackgroundCap);
     });
 
     private void ApplyNativeGraphics(string? command)
     {
         if(command=="graphics/CHECK00" || command?.StartsWith("graphics/TRACK",StringComparison.Ordinal)==true)
-        { _graphicsState.ResolutionDropdown=false;_graphicsState.UiScaleDropdown=false;_graphicsState.TextureDropdown=false;PublishGraphicsPreview(); }
+        { _graphicsState.ResolutionDropdown=false;_graphicsState.UiScaleDropdown=false;_graphicsState.TextureDropdown=false;_graphicsState.AdapterDropdown=false;PublishGraphicsPreview(); }
         else if(command is not null)ActivateGraphics(command);
     }
 
@@ -155,6 +181,8 @@ internal sealed partial class EnbOptionsUi
     private void RollbackGraphicsPreview()
     {
         if(_graphicsState?.PreviewActive==true)PreviewEnhancedGraphics?.Invoke(_graphicsState.OriginalEnhanced);
+        if(_graphicsState?.PreviewActive==true&&_graphicsState.Adapter!=_graphicsState.OriginalAdapter)
+        {PreviewGraphicsAdapter?.Invoke(_graphicsState.OriginalAdapter);_graphicsState.Adapter=_graphicsState.OriginalAdapter;}
         if(_graphicsState?.PreviewActive==true && _graphicsState.TextureOverrides!=_graphicsState.OriginalTextureOverrides)
             PreviewTextureOverrides?.Invoke(_graphicsState.OriginalTextureOverrides);
         _graphicsPanel?.CancelInput();_graphicsState?.Retire(PreviewGraphicsOptions,CancelDisplayPreview);

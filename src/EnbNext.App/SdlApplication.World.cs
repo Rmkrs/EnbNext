@@ -15,6 +15,8 @@ internal sealed partial class SdlApplication
     {
         // Why a page did not load goes to the session log (the address's query carries the session handoff, so only the host).
         long started=System.Diagnostics.Stopwatch.GetTimestamp();
+        // A browser's first page loads heavily: no lag is judged meanwhile.
+        lagMonitor.Hold(TimeSpan.FromSeconds(3));
         var browser=browserService.Create(address,profile,query);string host=address.Host;
         // Opening and closing are logged with their times, so a slow frame can be matched to a browser.
         AppendTranscript(FormattableString.Invariant($"Browser {host}: created in {System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds:0} ms"));
@@ -65,7 +67,7 @@ internal sealed partial class SdlApplication
         options.PreviewEnhancedGraphics=value=>owner.World.EnhancedGraphics=value;
         options.SaveEnhancedGraphics=value=>{_preferences=_preferences with {EnhancedGraphics=value};SavePreferences();};
         options.TextureOverridesRequested=()=>_client?.RetailAssets is {} assets?(assets.TextureOverridesEnabled?assets.SelectedTexturePack:""):_preferences.TexturePack;
-        options.PreviewTextureOverrides=name=>_client?.RetailAssets?.SelectTexturePack(name);
+        options.PreviewTextureOverrides=name=>{lagMonitor.Hold(ForegroundSettle);_client?.RetailAssets?.SelectTexturePack(name);};
         options.SaveTextureOverrides=name=>
         {
             bool changed=(_preferences.TexturePack??(_preferences.TextureOverrides?null:""))!=name;
@@ -81,8 +83,12 @@ internal sealed partial class SdlApplication
         options.CharacterDisplayNameRequested=()=>_selectedCharacter?.FullName;
         options.BeginDisplayPreview=BeginDisplayPreview;options.PreviewDisplayRequested=choice=>ApplyDisplayChoice(choice,false);
         options.CommitDisplayPreview=CommitDisplayPreview;options.CancelDisplayPreview=CancelDisplayPreview;
+        options.GraphicsAdaptersRequested=GraphicsAdapterChoices;options.GraphicsAdapterRequested=()=>ChosenGraphicsAdapter;
+        options.GraphicsAdapterAtRestart=GraphicsAdapterAtRestart;
+        options.PreviewGraphicsAdapter=key=>PreviewGraphicsAdapter(options,key);options.SaveGraphicsAdapter=SaveGraphicsAdapter;
         owner.Inventory.BrowserFactory=CreateBrowser;
         owner.ChatRequested=SubmitWorldChatAsync;owner.Issues=_runtimeIssues;
+        owner.Chat.DeveloperReportRequested=RequestDeveloperReport;
         if(entryAudio is not null)owner.AdoptClientAudio(entryAudio);
         worldScreen=screen;ReleaseFrontend();screen.Start();window.Title(WindowTitle);
     }
@@ -116,6 +122,7 @@ internal sealed partial class SdlApplication
     {
         if(TryWaypointCommand(request.Text))return Task.FromResult(true);
         if(TryReconnectCommand(request.Text))return Task.FromResult(true);
+        if(TryReportCommand(request.Text))return Task.FromResult(true);
         if(!string.Equals(request.Text.Trim(),"/fps",StringComparison.OrdinalIgnoreCase))return _client?.SubmitChatAsync(request)??Task.FromResult(false);
         _showFrameTitle=!_showFrameTitle;_frameTitleAverage.Reset();
         if(_showFrameTitle)FrameIntervalClock.FrameStarted+=UpdateFrameTitle;

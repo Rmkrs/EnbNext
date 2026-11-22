@@ -71,7 +71,11 @@ internal sealed class EnbUiLayoutProfiles
     internal void Reload(){if(!Editing&&path is not null)OpenStore(path,character);}
     internal static string DefaultPath=>Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"EnbNext","ui-layouts.json");
     internal void SetContext(bool docked,EnbUiSize size){Size=size;if(Docked==docked)return;Docked=docked;Refresh();}
-    internal EnbUiPlacement Placement(EnbUiGroup group)=>placements[(int)group];
+    // The Modern UI chat windows place themselves (moved and sized where they stand), so the layout moves none of them.
+    internal EnbUiPlacement Placement(EnbUiGroup group)=>group==EnbUiGroup.ModernChat?EnbUiPlacement.Identity:placements[(int)group];
+    /// <summary>A place the layout editor gave an element it no longer places (the Modern UI chat panel), applied to its
+    /// built-in place until the element has a place of its own.</summary>
+    internal EnbUiRect ApplyStored(EnbUiGroup group,EnbUiRect rect)=>placements[(int)group] is {IsValid:true,IsIdentity:false} placed?placed.Apply(rect,Size):rect;
     /// <summary>A panel layout option (for every profile).</summary>
     internal bool Option(string key)=>Document.Options.Contains(key);
     /// <summary>Sets a panel layout option. Keys of the form "Panel/Choice=value" are one choice among their siblings:

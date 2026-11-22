@@ -20,6 +20,8 @@ internal sealed partial class EnbWorldUi
             new("Net-7 Wiki", () => Inventory.OpenModernWikiHome()),
             // The retail Get Help and Self Help pages all lead to the Net-7 support site (tickets for a GM).
             new("Contact a GM", () => Options.OpenInformationBrowser(0, "Support")),
+            // Next: a lag report for the developer.
+            .. (Chat.DeveloperReportRequested is { } report ? new EnbModernMenuItem[] { new("Send a report to the developer", report) } : []),
         ], new(button.X, button.Y - 2), true, button);
         hudOwner.QueueUtilitySound("SR_scifielectronic40.wav");
     }

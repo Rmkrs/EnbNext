@@ -8,7 +8,7 @@ internal sealed partial class EnbGraphicsPanel : IEnbUiGadgetHandler
 {
     // Existing Next display overlay precedes the retail collection; 14..23 retain native order.
     private EnbUiGadgetPointer? pointer;
-    public EnbUiGadgetPointer Pointer=>pointer??=new(choiceCapacity+20,1u<<14,custom:this);
+    public EnbUiGadgetPointer Pointer=>pointer??=new(choiceCapacity+21,1u<<14,custom:this);
     private EnbUiPoint inputPoint;
     private long inputTime;
     private bool wheelFrame;
@@ -25,14 +25,14 @@ internal sealed partial class EnbGraphicsPanel : IEnbUiGadgetHandler
     {
         >=0 and <12=>$"graphics/choice{index:00}",12=>"graphics/scopeSystem",13=>"graphics/scopeCharacter",
         14=>"graphics/CHECK00",15=>"graphics/TRACK04",16=>"graphics/TRACK03",17=>"graphics/TRACK02",18=>"graphics/TRACK01",19=>"graphics/TRACK00",
-        20=>"graphics/RESOLUTION",21=>"graphics/CANCEL",22=>"graphics/OK",23=>"graphics/EXIT",24=>"graphics/UISCALE",25=>"graphics/TEXTUREOVERRIDES",26=>"graphics/ENHANCED",27=>"graphics/BLOOM",28=>"graphics/HDR",29=>"graphics/SUPERSAMPLING",30=>"graphics/ANISOTROPIC",31=>"graphics/BGCAP",>=32=>$"graphics/choice{index-20:00}",_=>null
+        20=>"graphics/RESOLUTION",21=>"graphics/CANCEL",22=>"graphics/OK",23=>"graphics/EXIT",24=>"graphics/UISCALE",25=>"graphics/TEXTUREOVERRIDES",26=>"graphics/ENHANCED",27=>"graphics/BLOOM",28=>"graphics/HDR",29=>"graphics/SUPERSAMPLING",30=>"graphics/ANISOTROPIC",31=>"graphics/BGCAP",32=>"graphics/ADAPTER",>=33=>$"graphics/choice{index-21:00}",_=>null
     };
     private static int InputIndex(string key)
     {
         if(Row(key) is int row)return 19-row;
         if(key.StartsWith("graphics/choice")&&int.TryParse(key.AsSpan(15),out int choice)&&choice>=0)return ChoiceInput(choice);
         return key switch {"graphics/scopeSystem"=>12,"graphics/scopeCharacter"=>13,"graphics/CHECK00"=>14,
-            "graphics/ANISOTROPIC"=>30,"graphics/BGCAP"=>31,"graphics/SUPERSAMPLING"=>29,"graphics/HDR"=>28,"graphics/ENHANCED"=>26,"graphics/BLOOM"=>27,"graphics/TEXTUREOVERRIDES"=>25,"graphics/UISCALE"=>24,"graphics/RESOLUTION"=>20,"graphics/CANCEL"=>21,"graphics/OK"=>22,"graphics/EXIT"=>23,_=>-1};
+            "graphics/ANISOTROPIC"=>30,"graphics/BGCAP"=>31,"graphics/ADAPTER"=>32,"graphics/SUPERSAMPLING"=>29,"graphics/HDR"=>28,"graphics/ENHANCED"=>26,"graphics/BLOOM"=>27,"graphics/TEXTUREOVERRIDES"=>25,"graphics/UISCALE"=>24,"graphics/RESOLUTION"=>20,"graphics/CANCEL"=>21,"graphics/OK"=>22,"graphics/EXIT"=>23,_=>-1};
     }
     private static int? Row(string key)
     {
@@ -56,19 +56,20 @@ internal sealed partial class EnbGraphicsPanel : IEnbUiGadgetHandler
         hits[25]=advanced&&checkbox.Contains(point);
         hits[24]=advanced&&Gadgets[scopeStart+2].Bounds.Contains(point);
         hits[31]=advanced&&Gadgets[scopeStart+9].Bounds.Contains(point);
+        hits[32]=AdapterVisible&&Gadgets[scopeStart+10].Bounds.Contains(point);
         hits[12]=!advanced&&Gadgets[scopeStart].Bounds.Contains(point);hits[13]=!advanced&&Gadgets[scopeStart+1].Bounds.Contains(point);
         for(int i=0;i<resources.Pieces.Length;i++)
         {
             var piece=resources.Pieces[i];int index=InputIndex(Gadgets[i].Key);
             if((index==14||index is >=20 and <=23)&&RetailVisible(piece.Name))hits[index]=piece.Query.Contains(x,y-(float)((Gadgets[i].Bounds.Y-piece.Bounds.Y)/480));
-            if((piece.Query with {ParentSphere=resources.BackgroundSphere}).Contains(x,y))hits[choiceCapacity+20]=true;
+            if((piece.Query with {ParentSphere=resources.BackgroundSphere}).Contains(x,y))hits[choiceCapacity+21]=true;
         }
-        hits[choiceCapacity+20]|=Design("graphics/FRAME").Contains(point);
+        hits[choiceCapacity+21]|=Design("graphics/FRAME").Contains(point);
         for(int row=0;row<5;row++)if(RowEnabled(row))
             hits[19-row]=wheel?resources.WheelBounds[row].Contains(point):Slider(row).Hit(point)!=EnbScrollbarPart.None;
     }
     public bool Contains(float x,float y,bool dropdown,int choices)
-    {LayoutChoices(choices);Span<bool> hits=stackalloc bool[choiceCapacity+21];Hits(hits,x,y,dropdown,choices,false);foreach(bool h in hits)if(h)return true;return false;}
+    {LayoutChoices(choices);Span<bool> hits=stackalloc bool[choiceCapacity+22];Hits(hits,x,y,dropdown,choices,false);foreach(bool h in hits)if(h)return true;return false;}
     public string? AdvanceInput(EnbUiInputQueue queue,EnbUiSize size,double scaling,long now,bool dropdown,int choices)
     {
         if(disposed||!state.PreviewActive){CancelInput();return null;}
@@ -91,10 +92,11 @@ internal sealed partial class EnbGraphicsPanel : IEnbUiGadgetHandler
         }
         LayoutChoices(choices);
         for(int i=0;i<choiceCapacity;i++)if(!dropdown||i>=choices)Pointer.Retire(ChoiceInput(i));
-        if(!state.Advanced)for(int i=24;i<=31;i++)Pointer.Retire(i);
+        if(!state.Advanced)for(int i=24;i<=32;i++)Pointer.Retire(i);
+        else if(!AdapterVisible)Pointer.Retire(32);
         else{Pointer.Retire(12);Pointer.Retire(13);Pointer.Retire(14);Pointer.Retire(20);}
         if(!state.Enhanced.Enabled){Pointer.Retire(27);Pointer.Retire(28);Pointer.Retire(29);Pointer.Retire(30);}
-        Span<bool> hits=stackalloc bool[choiceCapacity+21];Hits(hits,x,y,dropdown,choices,wheelFrame);
+        Span<bool> hits=stackalloc bool[choiceCapacity+22];Hits(hits,x,y,dropdown,choices,wheelFrame);
         Pointer.Prepare(hits);
     }
     public string? CompleteInput(EnbUiPointerFrame frame,EnbUiInputQueue queue,EnbUiSize size,double scaling,long now)
@@ -110,13 +112,13 @@ internal sealed partial class EnbGraphicsPanel : IEnbUiGadgetHandler
             int index=label.InputIndex;
             label.Ink=label.Clock.Update(palette,d.Properties,EnbAttachedFontColor.Contains(label.Clip,width,height,queue.X,queue.Y),index>=0&&Pointer.Selected(index),now);
         }
-        if(command>=0&&command<choiceCapacity+20)return InputKey(command);
+        if(command>=0&&command<choiceCapacity+21)return InputKey(command);
         return command<0&&frame.Code==0x1b&&frame.Modifiers==0?"graphics/EXIT":null;
     }
-    bool IEnbUiGadgetHandler.HasFlash(int index)=>index<choiceCapacity+20;
+    bool IEnbUiGadgetHandler.HasFlash(int index)=>index<choiceCapacity+21;
     int IEnbUiGadgetHandler.FlashSource(int index,bool beforeHitQuery)
     {
-        if(index==choiceCapacity+20)return -1;if(index is <15 or >19)return 0;if(wheelFrame)return -1;
+        if(index==choiceCapacity+21)return -1;if(index is <15 or >19)return 0;if(wheelFrame)return -1;
         var s=Slider(19-index);var part=beforeHitQuery?s.PreviousHit:s.CurrentHit;
         return part is EnbScrollbarPart.Up or EnbScrollbarPart.Thumb or EnbScrollbarPart.Down?(int)part:-1;
     }

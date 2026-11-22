@@ -28,6 +28,9 @@ internal sealed class SdlFrontendScreen : IDisposable
     }
     internal void Resize(){Owner.Bounds=new(0,0,window.Size.Width,window.Size.Height);Owner.RenderScaling=window.Scale;}
     internal void CancelPointer()=>input.Cancel();
+    /// <summary>Presentation moves to another graphics card: the frontend scene and tooltip release their GL objects.</summary>
+    internal void SuspendGpu(){Owner._creationTooltipGpu.SuspendGl(window.Gl);Owner._gpu.SuspendGl(window.Gl);}
+    internal void ResumeGpu(){Owner._gpu.InitializeGl(window.Gl);Owner._creationTooltipGpu.InitializeGl(window.Gl);}
     internal bool Handle(SDL_Event e)=>input.Handle(e);
     internal void Tick(){Owner.UpdateFrame();input.Sync();}
     internal void Render(SdlUiGpuSurface surface)

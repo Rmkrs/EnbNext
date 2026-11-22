@@ -61,6 +61,9 @@ internal sealed class SdlWorldScreen : IDisposable
         try{Owner.World.InitializeGl(window.Gl);Owner.Hud.InitializeGl(window.Gl);Host.Start();}
         catch{Dispose();throw;}
     }
+    /// <summary>Presentation moves to another graphics card: the world and HUD release their GL objects and keep the scene.</summary>
+    internal void SuspendGpu(){Owner.Hud.SuspendGl(window.Gl);Owner.World.SuspendGl(window.Gl);}
+    internal void ResumeGpu(){Owner.World.InitializeGl(window.Gl);Owner.Hud.InitializeGl(window.Gl);}
     internal SdlPointerCapture Capture=>input.Capture;
     internal Action? DiagnosticCaptureLost {set=>input.DiagnosticCaptureLost=value;}
     internal void SuspendGameplay(){keyboard.SuspendGameplay();}

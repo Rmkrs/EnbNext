@@ -30,10 +30,12 @@ internal sealed partial class EnbGraphicsPanel : IDisposable
     private readonly EnbOptionsPanelResources fonts;
     private readonly EnbFontEffectPalette palette;
     private readonly EnbGraphicsSettingsState state;
-    private Label[] labels=new Label[34];
+    private Label[] labels=new Label[35];
     private int choiceCapacity=12;
-    private Gadget ChoiceGadget(int i)=>Gadgets[i<12?choiceStart+i:scopeStart+10+i-12];
-    private static int ChoiceInput(int i)=>i<12?i:i+20;
+    private Gadget ChoiceGadget(int i)=>Gadgets[i<12?choiceStart+i:scopeStart+11+i-12];
+    private static int ChoiceInput(int i)=>i<12?i:i+21;
+    // Advanced Graphics: the graphics card shares the footer row when there is a choice of card.
+    private bool AdapterVisible=>state.Advanced&&state.Adapters.Length>2;
     public Gadget[] Gadgets { get; private set; }
     private readonly EnbUiRect leftBounds,rightBounds,authoredOk,authoredCancel,authoredFrame,authoredTrack;
     private readonly (Vector3 Position,EnbUiRect Clip)[] authoredLabels=new (Vector3,EnbUiRect)[12];
@@ -48,7 +50,7 @@ internal sealed partial class EnbGraphicsPanel : IDisposable
     {
         this.resources=resources;this.horizontal=horizontal;this.fonts=fonts;this.palette=palette;this.state=state;
         sliderStart=resources.Pieces.Length;choiceStart=sliderStart+15;scopeStart=choiceStart+12;
-        Gadgets=new Gadget[scopeStart+10];
+        Gadgets=new Gadget[scopeStart+11];
         for(int i=0;i<sliderStart;i++)Gadgets[i]=new("graphics/"+resources.Pieces[i].Name,resources.Pieces[i].Bounds);
         leftBounds=EnbAuthoredUiAsset.MeshBounds(horizontal.Left,horizontal.Left.Resource.Meshes.Single().Name).Translate(-320,-240);
         rightBounds=EnbAuthoredUiAsset.MeshBounds(horizontal.Right,horizontal.Right.Resource.Meshes.Single().Name).Translate(-320,-240);
@@ -67,6 +69,7 @@ internal sealed partial class EnbGraphicsPanel : IDisposable
         Gadgets[scopeStart+3]=new("graphics/TEXTUREOVERRIDES",default);
         for(int i=0;i<5;i++)Gadgets[scopeStart+4+i]=new(i==0?"graphics/ENHANCED":i==1?"graphics/BLOOM":i==2?"graphics/HDR":i==3?"graphics/SUPERSAMPLING":"graphics/ANISOTROPIC",default);
         Gadgets[scopeStart+9]=new("graphics/BGCAP",default);
+        Gadgets[scopeStart+10]=new("graphics/ADAPTER",default);
         authoredTrack=Design("graphics/TRACK04");
         var transforms=EnbAuthoredUiAsset.ResolveTransforms(resources.Asset);
         for(int i=0;i<12;i++)if(layout.TryResolve(LabelId(i),out var definition))
@@ -98,9 +101,11 @@ internal sealed partial class EnbGraphicsPanel : IDisposable
         Gadgets.First(g=>g.Key=="graphics/OK").Bounds=authoredOk.Translate(0,shift);
         Gadgets.First(g=>g.Key=="graphics/CANCEL").Bounds=authoredCancel.Translate(0,shift);
         Gadgets.First(g=>g.Key=="graphics/FRAME").Bounds=authoredFrame with {Height=authoredFrame.Height+shift};
-        double available=authoredCancel.Right-authoredOk.X,gap=8,scaleWidth=(available-gap)*.45;
+        double available=authoredCancel.Right-authoredOk.X,gap=8;bool adapters=AdapterVisible;
+        double third=(available-2*gap)/3,scaleWidth=adapters?third:(available-gap)*.45,textureWidth=adapters?third:available-scaleWidth-gap;
         Gadgets[scopeStart+2].Bounds=new(authoredOk.X,authoredOk.Y,scaleWidth,resolution.Height);
-        Gadgets[scopeStart+3].Bounds=new(authoredOk.X+scaleWidth+gap,authoredOk.Y,available-scaleWidth-gap,resolution.Height);
+        Gadgets[scopeStart+3].Bounds=new(authoredOk.X+scaleWidth+gap,authoredOk.Y,textureWidth,resolution.Height);
+        Gadgets[scopeStart+10].Bounds=adapters?new(authoredOk.X+scaleWidth+textureWidth+2*gap,authoredOk.Y,available-scaleWidth-textureWidth-2*gap,resolution.Height):default;
         var check=Design("graphics/CHECK00");
         for(int i=0;i<5;i++)Gadgets[scopeStart+4+i].Bounds=i==0?check:
             new(check.X+Indent,240-Track(i-1).Y-check.Height/2,check.Width,check.Height);
@@ -145,14 +150,15 @@ internal sealed partial class EnbGraphicsPanel : IDisposable
         if(count>choiceCapacity)
         {
             CancelInput();pointer=null;
-            var gadgets=Gadgets;Array.Resize(ref gadgets,scopeStart+10+count-12);Gadgets=gadgets;
-            Array.Resize(ref labels,34+count-12);
-            for(int i=choiceCapacity;i<count;i++)Gadgets[scopeStart+10+i-12]=new($"graphics/choice{i:00}",default);
+            var gadgets=Gadgets;Array.Resize(ref gadgets,scopeStart+11+count-12);Gadgets=gadgets;
+            Array.Resize(ref labels,35+count-12);
+            for(int i=choiceCapacity;i<count;i++)Gadgets[scopeStart+11+i-12]=new($"graphics/choice{i:00}",default);
             choiceCapacity=count;
         }
         var resolution=Design("graphics/RESOLUTION");
         if(state.UiScaleDropdown)resolution=Design("graphics/UISCALE");
         if(state.TextureDropdown)resolution=Design("graphics/TEXTUREOVERRIDES");
+        if(state.AdapterDropdown)resolution=Design("graphics/ADAPTER");
         double pitch=Math.Min(resolution.Height+1,resolution.Y/Math.Max(1,count));
         for(int i=0;i<count;i++)ChoiceGadget(i).Bounds=new(resolution.X,resolution.Y-(i+1)*pitch,resolution.Width,pitch-1);
     }
@@ -173,8 +179,8 @@ internal sealed partial class EnbGraphicsPanel : IDisposable
         IReadOnlyList<EnbDisplayChoice> choices,int choice,bool dropdown,EnbDisplayScope scope,string character,bool native)
     {
         if(disposed || !state.PreviewActive)return [];
-        int count=state.TextureDropdown?state.TexturePacks.Length:state.UiScaleDropdown?state.UiScales.Length:choices.Count;
-        dropdown|=state.UiScaleDropdown||state.TextureDropdown;LayoutChoices(count);UpdateGeometry();var result=ImmutableList.CreateBuilder<EnbUiModelDraw>();
+        int count=state.AdapterDropdown?state.Adapters.Length:state.TextureDropdown?state.TexturePacks.Length:state.UiScaleDropdown?state.UiScales.Length:choices.Count;
+        dropdown|=state.UiScaleDropdown||state.TextureDropdown||state.AdapterDropdown;LayoutChoices(count);UpdateGeometry();var result=ImmutableList.CreateBuilder<EnbUiModelDraw>();
         EnbUiRect Screen(EnbUiRect r)=>new(r.X*size.Width/640,r.Y*size.Height/480,r.Width*size.Width/640,r.Height*size.Height/480);
         for(int pass=0;pass<2;pass++)for(int i=0;i<sliderStart;i++)
         {
@@ -194,7 +200,7 @@ internal sealed partial class EnbGraphicsPanel : IDisposable
                 if(i==0)text="Advanced Graphics";
                 if(i==5)continue;
             }
-            if(i==11 && choices.Count>0)text=choices[choice].ButtonLabel+(dropdown&&!state.UiScaleDropdown&&!state.TextureDropdown?"  ^":"  v");
+            if(i==11 && choices.Count>0)text=choices[choice].ButtonLabel+(dropdown&&!state.UiScaleDropdown&&!state.TextureDropdown&&!state.AdapterDropdown?"  ^":"  v");
             string attach=definition.Properties["Attach"].ToUpperInvariant();
             var color=native?label.Ink:palette.Resolve(definition.Properties,hovered=="graphics/"+attach,elapsed);
             var rendered=Text(i,text,font,color,scaling);if(rendered.Raster is not { } raster)continue;
@@ -243,6 +249,19 @@ internal sealed partial class EnbGraphicsPanel : IDisposable
             label.FitTo(new(bounds.Width-4,bounds.Height),scaling);
             double fit=Math.Min(1,(bounds.Width-4)/Math.Max(1,label.Width));
             if(label.Raster is {} raster)result[^1]=result[^1] with {Images=[new(raster,new(bounds.Center.X-label.Width*fit/2,bounds.Center.Y-label.Height*fit/2,label.Width*fit,label.Height*fit))]};
+        }
+        if(AdapterVisible)
+        {
+            var adapterGadget=Gadgets[scopeStart+10];
+            Add(scaleAsset.Asset,adapterGadget,scaleAsset.Bounds.Translate(-320,-240),0,hovered==adapterGadget.Key);
+            if(fonts.Font("FONT_SMALL",size,scaling) is {} adapterFont)
+            {
+                var bounds=Screen(adapterGadget.Bounds);
+                var label=Text(34,"Card: "+state.AdapterLabel+"  v",adapterFont,new(1,1,1),scaling);
+                label.FitTo(new(bounds.Width-4,bounds.Height),scaling);
+                double fit=Math.Min(1,(bounds.Width-4)/Math.Max(1,label.Width));
+                if(label.Raster is {} raster)result[^1]=result[^1] with {Images=[new(raster,new(bounds.Center.X-label.Width*fit/2,bounds.Center.Y-label.Height*fit/2,label.Width*fit,label.Height*fit))]};
+            }
         }
         var checkAsset=resources.Pieces.First(p=>p.Name=="CHECK00");
         var capGadget=Gadgets[scopeStart+9];
@@ -296,11 +315,12 @@ internal sealed partial class EnbGraphicsPanel : IDisposable
             for(int i=0;i<count;i++)
             {
                 var gadget=ChoiceGadget(i);var screen=Screen(gadget.Bounds);
-                var text=Text(i<12?14+i:34+i-12,state.TextureDropdown?EnbGraphicsSettingsState.TextureLabel(state.TexturePacks[i]):state.UiScaleDropdown?state.ScaleLabel(state.UiScales[i]):choices[i].ButtonLabel,choiceFont,(state.TextureDropdown?state.TexturePacks[i]==state.TextureOverrides:state.UiScaleDropdown?state.UiScales[i]==state.UiScale:i==choice)?new(1,1,0):new(1,1,1),scaling);
+                bool current=state.AdapterDropdown?i==state.AdapterIndex:state.TextureDropdown?state.TexturePacks[i]==state.TextureOverrides:state.UiScaleDropdown?state.UiScales[i]==state.UiScale:i==choice;
+                var text=Text(i<12?14+i:35+i-12,state.AdapterDropdown?state.Adapters[i].Label:state.TextureDropdown?EnbGraphicsSettingsState.TextureLabel(state.TexturePacks[i]):state.UiScaleDropdown?state.ScaleLabel(state.UiScales[i]):choices[i].ButtonLabel,choiceFont,current?new(1,1,0):new(1,1,1),scaling);
                 text.FitTo(new(screen.Width-4,screen.Height),scaling);
                 double fit=Math.Min(1,Math.Min((screen.Width-4)/Math.Max(1,text.Width),screen.Height/Math.Max(1,text.Height)));
                 ImmutableArray<EnbUiTextDraw> rows=text.Raster is { } raster?[new(raster,new(screen.Center.X-text.Width*fit/2,screen.Center.Y-text.Height*fit/2,text.Width*fit,text.Height*fit))]:[];
-                result.Add(new(resolution.Asset,(state.TextureDropdown?state.TexturePacks[i]==state.TextureOverrides:state.UiScaleDropdown?state.UiScales[i]==state.UiScale:i==choice)?1u:0u,screen,native?Pointer.Flash(ChoiceInput(i)):hovered==gadget.Key){GadgetOwner=gadget,DesignBounds=resolution.Bounds.Translate(-320,-240),Images=rows,FlashHighlight=native&&Pointer.Flash(ChoiceInput(i))&&!Pointer.FlashInside(ChoiceInput(i))});
+                result.Add(new(resolution.Asset,current?1u:0u,screen,native?Pointer.Flash(ChoiceInput(i)):hovered==gadget.Key){GadgetOwner=gadget,DesignBounds=resolution.Bounds.Translate(-320,-240),Images=rows,FlashHighlight=native&&Pointer.Flash(ChoiceInput(i))&&!Pointer.FlashInside(ChoiceInput(i))});
             }
         }
         }

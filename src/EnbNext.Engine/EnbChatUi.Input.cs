@@ -27,7 +27,8 @@ internal sealed partial class EnbChatUi
     internal void Press(string id,EnbUiPoint point,bool left,bool right)
     {
         _last=point;
-        if(IsHistorySlider(id)&&(left||right))BeginHistorySlider(id); // 0066F330 mask 11: left and right alike.
+        if(left&&!right&&_modernChat&&ModernPress(id,point)){}
+        else if(IsHistorySlider(id)&&(left||right))BeginHistorySlider(id); // 0066F330 mask 11: left and right alike.
         else if(IsChatListSlider(id)&&left)
         {
             _drag=id;_listScrollAtGrab=ChatListScroll;_listCaptured=true;_listGrab=_last.Y-_listThumb.Top;
@@ -45,6 +46,7 @@ internal sealed partial class EnbChatUi
     internal bool Move(string id,EnbUiPoint point)
     {
         _pingPointer=point;UpdatePingTooltip();if(_drag!=id)return false;
+        if(ModernDragMove(id,point)){_last=point;Publish();return true;}
         double delta=(point.Y-_last.Y)*480/_size.Height;
         if(IsHistorySlider(id)){if(id.StartsWith("thumb"))DragHistoryThumb(point);}
         else if(IsChatListSlider(id)&&id.EndsWith("/thumb",StringComparison.Ordinal))DragChatListThumb(point);
@@ -66,6 +68,7 @@ internal sealed partial class EnbChatUi
     internal void Release(string id)
     {
         if(_drag!=id)return;
+        if(_modernGrab==id){_drag=null;CaptureRequested?.Invoke(null);ModernRelease(id);return;}
         if(IsHistorySlider(id))EndHistorySlider();
         _drag=null;_listRepeat=0;_listCaptured=false;CaptureRequested?.Invoke(null);
         if(id is "resize" or "split")SaveSettings();
@@ -73,6 +76,7 @@ internal sealed partial class EnbChatUi
     }
     internal void CaptureLost(string id)
     {
+        if(_modernGrab==id){_drag=null;EndModernDrag();Publish();}
         if(IsHistorySlider(id)&&_drag==id)EndHistorySlider();
         if(IsChatList&&_drag==id){_drag=null;_listCaptured=false;_listRepeat=0;}
     }

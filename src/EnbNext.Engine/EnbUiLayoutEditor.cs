@@ -17,11 +17,11 @@ internal sealed partial class EnbUiLayoutEditor(EnbWorldUi ui)
     // Modern UI swaps the retail target panel and target portrait for its player and target frames.
     // Only the fixed elements: the Modern UI windows (inventory, equipment, skills, missions, factions, commands, friends,
     // guild, group finder, options, maps, My characters, damage meter) are dragged where they stand and keep their place.
-    private static readonly EnbUiGroup[] ModernSpace=[EnbUiGroup.ActionBar,EnbUiGroup.TargetButtons,EnbUiGroup.Engine,EnbUiGroup.CombatXp,EnbUiGroup.ExploreXp,EnbUiGroup.TradeXp,EnbUiGroup.PlayerFrame,EnbUiGroup.TargetFrame,EnbUiGroup.ModernChat,EnbUiGroup.ModernGroup,EnbUiGroup.Utility];
+    private static readonly EnbUiGroup[] ModernSpace=[EnbUiGroup.ActionBar,EnbUiGroup.TargetButtons,EnbUiGroup.Engine,EnbUiGroup.CombatXp,EnbUiGroup.ExploreXp,EnbUiGroup.TradeXp,EnbUiGroup.PlayerFrame,EnbUiGroup.TargetFrame,EnbUiGroup.ModernGroup,EnbUiGroup.Utility];
     private static readonly EnbUiGroup[] DockedTip=[..DockedSpace,EnbUiGroup.Tooltip],RetailTip=[..RetailSpace,EnbUiGroup.Tooltip],ModernTip=[..ModernSpace,EnbUiGroup.Tooltip];
     // Docked with Modern UI: what its station HUD shows (EnbModernHud.Station: micro menu, experience and group) and its
-    // chat panel; none of the retail station panels and none of the freely dragged windows.
-    private static readonly EnbUiGroup[] DockedModern=[EnbUiGroup.ModernChat,EnbUiGroup.ModernGroup,EnbUiGroup.CombatXp,EnbUiGroup.ExploreXp,EnbUiGroup.TradeXp,EnbUiGroup.Utility],DockedModernTip=[..DockedModern,EnbUiGroup.Tooltip];
+    // none of the retail station panels and none of the freely dragged windows (the chat windows among them).
+    private static readonly EnbUiGroup[] DockedModern=[EnbUiGroup.ModernGroup,EnbUiGroup.CombatXp,EnbUiGroup.ExploreXp,EnbUiGroup.TradeXp,EnbUiGroup.Utility],DockedModernTip=[..DockedModern,EnbUiGroup.Tooltip];
     /// <summary>Whether the current element list holds a group: only those get a layout preview.</summary>
     internal bool Lists(EnbUiGroup group){foreach(var listed in Elements)if(listed==group)return true;return false;}
     internal int ProfileScroll {get;private set;}
@@ -132,8 +132,7 @@ internal sealed partial class EnbUiLayoutEditor(EnbWorldUi ui)
             Add(EnbUiGroup.Cockpit,ui.Cockpit.LayoutBounds(false));Add(EnbUiGroup.Buffs,ui.Cockpit.LayoutBounds(true));
             if(ui.Scanner.IsVisible)Add(EnbUiGroup.Scanner,ui.Scanner.LayoutBounds);
         }
-        foreach(var h in ui.Chat.Hits.Values)if(h.IsVisible&&h.IsHitTestVisible)Add(h.Group,h.Bounds);
-        if(ui.Chat.ModernChat)Add(EnbUiGroup.ModernChat,ui.Chat.ModernChatArea);
+        foreach(var h in ui.Chat.Hits.Values)if(h.IsVisible&&h.IsHitTestVisible&&h.Group!=EnbUiGroup.ModernChat)Add(h.Group,h.Bounds);
         foreach(var d in ui.Options.Presentation)if(d.LayoutGroup!=EnbUiGroup.None)Add(d.LayoutGroup,d.Bounds);
         if(ui.Map.IsOpen||ui.Map.LayoutPreview)Add(EnbUiGroup.Map,ui.Map.LayoutBounds);
         foreach(var d in ui.Inventory.Presentation)if(d.LayoutGroup!=EnbUiGroup.None)Add(d.LayoutGroup,d.Bounds);

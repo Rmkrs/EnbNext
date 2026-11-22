@@ -48,6 +48,15 @@ internal sealed partial class EnbOptionsUi : IDisposable
     public Func<string?>? TextureOverridesRequested {get;set;}
     public Action<string?>? PreviewTextureOverrides {get;set;}
     public Action<string?>? SaveTextureOverrides {get;set;}
+    /// <summary>The graphics cards to present on, "Automatic" (the card Windows picks) first; empty where the card cannot be chosen.</summary>
+    public Func<(string? Key,string Label)[]>? GraphicsAdaptersRequested {get;set;}
+    /// <summary>The card in use (null: Automatic).</summary>
+    public Func<string?>? GraphicsAdapterRequested {get;set;}
+    /// <summary>Moves presentation to a card between frames, as a preview: OK keeps it, Cancel moves back.</summary>
+    public Action<string?>? PreviewGraphicsAdapter {get;set;}
+    public Action<string?>? SaveGraphicsAdapter {get;set;}
+    /// <summary>True where choosing this card takes effect only when EnbNext starts again (Linux).</summary>
+    public Func<string?,bool>? GraphicsAdapterAtRestart {get;set;}
     public Action<EnbRetailGraphicsOptions>? SaveGraphicsOptions { get; set; }
     public Action<EnbRetailGraphicsOptions?>? PreviewGraphicsOptions { get; set; }
     public Func<double?>? UiScaleRequested {get;set;}
@@ -229,7 +238,7 @@ internal sealed partial class EnbOptionsUi : IDisposable
     {
         if (ModernOptionsOpen) { ModernOptionsCancel(); return true; }
         if (InformationOpen) { LeavePetition(false); return true; }
-        if (_graphicsState?.Dropdown == true) { _graphicsState.UiScaleDropdown=false;_graphicsState.TextureDropdown=false;_graphicsState.ResolutionDropdown = false; Publish(); return true; }
+        if (_graphicsState?.Dropdown == true) { _graphicsState.UiScaleDropdown=false;_graphicsState.TextureDropdown=false;_graphicsState.AdapterDropdown=false;_graphicsState.ResolutionDropdown = false; Publish(); return true; }
         if (QuitOpen && ManualOpen)
         {
             _page = 4; _quitState.Retire();
@@ -246,7 +255,7 @@ internal sealed partial class EnbOptionsUi : IDisposable
         EndInformation(preserveHelp);
         EndSettings();
         RollbackGraphicsPreview();
-        bool wasOpen = IsOpen; _page = 0; if (_graphicsState is not null) { _graphicsState.ResolutionDropdown = false;_graphicsState.UiScaleDropdown=false;_graphicsState.TextureDropdown=false; } _quitState.Retire(); CloseManualBrowser(); _controlsPanel?.Retire(); ResetControlCapture(); CancelPointer(); ClearHover(); Publish(); return wasOpen;
+        bool wasOpen = IsOpen; _page = 0; if (_graphicsState is not null) { _graphicsState.ResolutionDropdown = false;_graphicsState.UiScaleDropdown=false;_graphicsState.TextureDropdown=false;_graphicsState.AdapterDropdown=false; } _quitState.Retire(); CloseManualBrowser(); _controlsPanel?.Retire(); ResetControlCapture(); CancelPointer(); ClearHover(); Publish(); return wasOpen;
     }
     public void Suspend() { _interactive = false; VisibilityChanged?.Invoke(false); CloseAll(); }
     public void CancelPointer() { ReleaseUiHostCapture(); CancelNativeInput(); }

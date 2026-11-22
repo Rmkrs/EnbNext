@@ -49,7 +49,7 @@ internal sealed partial class SdlApplication
         ReadPreferences();ReadStartupGroupDisplay();
         try
         {
-            window=new("EnbNext",ActiveDisplayPreferences.DisplayWidth,ActiveDisplayPreferences.DisplayHeight,true);
+            window=CreateWindow(ActiveDisplayPreferences.DisplayWidth,ActiveDisplayPreferences.DisplayHeight,_preferences.GraphicsAdapter,out activeGraphicsAdapter);
             surface.BrowserSnapshots=browserSnapshots;
             browserService=new(window,browserSnapshots,Post);
             InitializePreferences();InitializeDiagnostics();
@@ -135,7 +135,7 @@ internal sealed partial class SdlApplication
                 handled=Stopwatch.GetTimestamp();
                 browserService.Pump();
                 dispatch.Drain();drained=Stopwatch.GetTimestamp();
-                TickPreferences();TickSettingsScopes();TickGroupLaunch();TickMultibox();TickFocusMode();TickMultiboxMenu();TickCombatMeter();TickWaypointArrow();TickMissionTracker();TickModernUi();TickStuckAnswer();TickDiscordPresence();
+                TickPreferences();TickSettingsScopes();TickGroupLaunch();TickMultibox();TickFocusMode();TickMultiboxMenu();TickCombatMeter();TickWaypointArrow();TickMissionTracker();TickModernUi();TickStuckAnswer();TickLagReports();TickDiscordPresence();
                 LiveWorldOpenAlAudio.SetFocusMuted(_preferences.QualityOfLife?.MuteBackgroundAudio==true && !window.Focused);
                 long now=Environment.TickCount64;
                 // The world advances once per rendered frame, like retail SClientRunFrame 00742B60: one frame time
@@ -180,6 +180,7 @@ internal sealed partial class SdlApplication
                 }
                 FrameSucceeded();
                 RecordSlowFrame(begin,handled,drained,ticked,rendered);
+                ObserveLagFrame(begin,handled,drained,ticked,rendered);
             }
             catch(Exception ex) when(_inspectFailure is null)
             {RecoverFromFault(ex);}

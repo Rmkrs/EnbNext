@@ -11,7 +11,7 @@ public sealed record EnbQualityOfLifeOptions(bool MuteBackgroundAudio = false,
     bool RightClickCancelsTarget = false, bool HideCorpses = false, bool KeepLocalOnEscape = false, bool StationFreeMovement = false,
     bool ConnectionIndicator = false, bool AttackerNames = false, bool HideGutterRail = false, int HiddenIconKinds = 0,
     int StationLookSpeed = 100, bool ChatTimes = false, bool ChatKeepHistory = false, bool ChatSaveLogs = false,
-    bool RouteWormholes = false)
+    bool RouteWormholes = false, bool LagReports = true, bool LagReportsAutomatic = false)
 {
     public const int ArrowSizeMinimum = 50, ArrowSizeMaximum = 200, ArrowSizeStep = 10;
     public int ArrowSizePercent => Math.Clamp(WaypointArrowSize, ArrowSizeMinimum, ArrowSizeMaximum);

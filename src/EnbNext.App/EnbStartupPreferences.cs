@@ -20,7 +20,7 @@ internal sealed record EnbStartupPreferences(
     double? ModernMapX = null, double? ModernMapY = null, double? ModernMapWidth = null, double? ModernMapHeight = null,
     int ModernMapNames = 7, bool ModernMapPointerCoordinates = false, bool ModernMapSeeThrough = true, bool ModernGalaxySchematic = false,
     double? ModernGalaxyX = null, double? ModernGalaxyY = null, double? ModernGalaxyWidth = null, double? ModernGalaxyHeight = null, bool ModernGalaxySeeThrough = true,
-    int FocusNameSize = 24)
+    int FocusNameSize = 24, string? GraphicsAdapter = null)
 {
     // Advanced Graphics: the cap is off by default; BackgroundGameplayFps keeps the chosen value (0 is the old unchecked state).
     public int BackgroundFpsLimit => BackgroundFpsCap ? (BackgroundGameplayFps > 0 ? BackgroundGameplayFps : 60) : 0;

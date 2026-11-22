@@ -72,7 +72,7 @@ internal sealed unsafe class CefBrowserSurface:IEnbInventoryBrowser,ISdlBrowserL
     {
         this.window=window;this.layers=layers;this.post=post;address=uri;this.query=query;
         if(uri.Scheme is not ("http" or "https"))throw new ArgumentException("The terminal requires an HTTP address");
-        callback=OnEvent;resolve=name=>name.StartsWith("egl",StringComparison.Ordinal)?(nint)SDL.SDL3.SDL_EGL_GetProcAddress(name):window.Gl.GetProcAddress(name);
+        callback=OnEvent;resolve=window.ProcAddress;
         page=CefNative.enb_cef_create(EnbNext.Net7.Net7StationBrowser.AppendQuery(uri,query).AbsoluteUri,Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(profile))),callback,0,resolve,window.NativeHandle,silent?1:0);
         if(page==0)throw new InvalidOperationException("CEF browser creation failed");layers.Add(this);
     }

@@ -231,6 +231,11 @@ internal sealed partial class EnbOptionsUi
                 string character = GraphicsCharacterDisplayName();
                 rows.Add(new("graphics/scope", EnbModernOptionKind.Choice, "Display settings for", Value: state.DisplayScope == EnbDisplayScope.System ? 0 : 1,
                     ValueText: state.DisplayScope == EnbDisplayScope.System ? "System" : character, Choices: ["System", character]));
+                // Next: the graphics card, where there is more than one. Windows changes it at once, like the
+                // resolution; Linux at the next start.
+                if (state.Adapters.Length > 2)
+                    rows.Add(new("graphics/adapter", EnbModernOptionKind.Choice, "Graphics card", Value: state.AdapterIndex,
+                        ValueText: state.AdapterLabel, Choices: [.. state.Adapters.Select(a => a.Label)]));
                 break;
             }
             case "advanced":
@@ -548,7 +553,7 @@ internal sealed partial class EnbOptionsUi
         }
         if (_modernCategory is not ("graphics" or "advanced")) return;
         var state = _graphicsState;
-        state.ResolutionDropdown = state.UiScaleDropdown = state.TextureDropdown = false;
+        state.ResolutionDropdown = state.UiScaleDropdown = state.TextureDropdown = state.AdapterDropdown = false;
         string choice = "graphics/choice" + index.ToString("00", CultureInfo.InvariantCulture);
         switch (id)
         {
@@ -556,6 +561,7 @@ internal sealed partial class EnbOptionsUi
             case "graphics/scope" when index <= 1: ActivateGraphics(index == 0 ? "graphics/scopeSystem" : "graphics/scopeCharacter"); break;
             case "graphics/uiscale" when index < state.UiScales.Length: state.UiScaleDropdown = true; ActivateGraphics(choice); break;
             case "graphics/textures" when index < state.TexturePacks.Length: state.TextureDropdown = true; ActivateGraphics(choice); break;
+            case "graphics/adapter" when index < state.Adapters.Length: SelectGraphicsAdapter(index); break;
             default: return;
         }
         TakeGraphicsError();

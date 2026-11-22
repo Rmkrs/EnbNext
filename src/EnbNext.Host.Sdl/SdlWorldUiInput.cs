@@ -105,6 +105,8 @@ internal sealed class SdlWorldUiInput : IDisposable
             {found=pair.Key;z=pair.Value.ZIndex;}
         return found;
     }
+    /// <summary>A chat hit's layout group: the retail chat's, or the Modern UI chat windows' (which the layout does not move).</summary>
+    private EnbUiGroup ChatGroup(string id)=>host.Owner.Chat.Hits.TryGetValue(id,out var hit)?hit.Group:EnbUiGroup.Chat;
     private Target Hit(bool honorCapture=true)
     {
         if(honorCapture&&Capture.Owner!=SdlPointerOwner.None)return Capture.Owner switch
@@ -157,7 +159,7 @@ internal sealed class SdlWorldUiInput : IDisposable
         hovered=target;
         switch(target.Kind)
         {
-            case SdlPointerOwner.Chat:if(target.Id is {} chat)ui.Chat.Hover(chat,host.Owner.Ui.Layout.Inverse(EnbUiGroup.Chat,point));break;
+            case SdlPointerOwner.Chat:if(target.Id is {} chat)ui.Chat.Hover(chat,host.Owner.Ui.Layout.Inverse(ChatGroup(chat),point));break;
             case SdlPointerOwner.Cockpit:if(target.Id is {} cockpit)ui.Cockpit.Hover(cockpit,point);break;
             case SdlPointerOwner.SkillMenu:if(target.Row>=0)ui.Cockpit.HoverMenu(target.Row,point);break;
         }
@@ -208,7 +210,7 @@ internal sealed class SdlWorldUiInput : IDisposable
                 case SdlPointerOwner.Inventory:await inventory.Handle(e);return true;
                 case SdlPointerOwner.Chat:
                     if(target.Id is not {} chat)return false;
-                    if(move)ui.Chat.Move(chat,host.Owner.Ui.Layout.Inverse(EnbUiGroup.Chat,point));else if(down)ui.Chat.Press(chat,host.Owner.Ui.Layout.Inverse(EnbUiGroup.Chat,point),left,right);else if(up)ui.Chat.Release(chat);else if(wheel)ui.Chat.Wheel(chat,delta);return true;
+                    if(move)ui.Chat.Move(chat,host.Owner.Ui.Layout.Inverse(ChatGroup(chat),point));else if(down)ui.Chat.Press(chat,host.Owner.Ui.Layout.Inverse(ChatGroup(chat),point),left,right);else if(up)ui.Chat.Release(chat);else if(wheel)ui.Chat.Wheel(chat,delta);return true;
                 case SdlPointerOwner.Cockpit:
                     if(target.Id is not {} cockpit)return false;
                     if(move)ui.Cockpit.MoveShortcutPointer(cockpit,point);else if(down)ui.Cockpit.PressPointer(cockpit,point,logicalButton);else if(up)ui.Cockpit.ReleasePointer(point,logicalButton);return true;

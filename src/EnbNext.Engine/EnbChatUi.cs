@@ -172,7 +172,7 @@ internal sealed partial class EnbChatUi : IDisposable
     // History text is not a station interaction widget. Keep actual chat
     // controls (including menus, editor, scrollbars and resize handles) blocking.
     public bool ContainsControl(Point point) => _enabled && _hits.Any(r =>
-        r.Value.Published && !r.Key.StartsWith("pane", StringComparison.Ordinal) && !r.Key.StartsWith("mchat/history", StringComparison.Ordinal) && r.Value.Bounds.Contains(UiLayout?.Inverse(r.Value.Group,point)??point));
+        r.Value.Published && !r.Key.StartsWith("pane", StringComparison.Ordinal) && !IsModernHistory(r.Key) && r.Value.Bounds.Contains(UiLayout?.Inverse(r.Value.Group,point)??point));
     public void DismissMenuOutside(Point point)
     {
         point=UiLayout?.Inverse(EnbUiGroup.Chat,point)??point;
@@ -1040,6 +1040,8 @@ internal sealed partial class EnbChatUi : IDisposable
             case "Help":
                 Add("Commands", OpenCommands);
                 foreach (string feature in new[] { "Get Help", "Self Help", "Captain's Log" }) Add(feature, () => { _menu = ""; CloseChatDialog(); InformationRequested?.Invoke(feature); Publish(); });
+                // Next: a lag report for the developer.
+                if (DeveloperReportRequested is { } report) Add("Send a report", () => { _menu = ""; CloseChatDialog(); report(); Publish(); });
                 break;
             case "Emote":
                 foreach (var (label, run) in EmoteEntries()) Add(label, run);
@@ -1082,10 +1084,10 @@ internal sealed partial class EnbChatUi : IDisposable
     {
         if (!_hits.TryGetValue(id, out var hit)) _hits[id] = hit = new();
         hit.Group = group;
-        hit.IsHitTestVisible = !_historyPassThrough || !id.StartsWith("pane", StringComparison.Ordinal) && id != "mchat/history";
+        hit.IsHitTestVisible = !_historyPassThrough || !id.StartsWith("pane", StringComparison.Ordinal) && !IsModernHistory(id);
         hit.Left = action; hit.Right = right; hit.Wheel = wheel;
         hit.Bounds = r; hit.Published = hit.IsVisible = true;
-        hit.ZIndex = id == "mchat/history" ? 0 : id == "replypopup/frame" ? 1 : id.StartsWith("chatdialog/m", StringComparison.Ordinal) && id.Contains("/scroll", StringComparison.Ordinal) ? 22 : id.StartsWith("mchat/menu", StringComparison.Ordinal) ? (id == "mchat/menu" ? 11 : 12) : id.StartsWith("chatdialog/ignore/entry/", StringComparison.Ordinal) ? (id.EndsWith("/drag", StringComparison.Ordinal) ? 22 : 23) : id.StartsWith("chatdialog/", StringComparison.Ordinal) ? (id == "chatdialog/block" ? 20 : 21) : id.StartsWith("entry", StringComparison.Ordinal) ? 12 : id == "menu" ? 11 : id is "resize" or "split" || id.StartsWith("thumb",StringComparison.Ordinal) ? 3 : id.StartsWith("pane", StringComparison.Ordinal) ? 0 : 2;
+        hit.ZIndex = group == EnbUiGroup.ModernChat && id.StartsWith("mchat/", StringComparison.Ordinal) ? ModernWindowZ(id) : id == "replypopup/frame" ? 1 : id.StartsWith("chatdialog/m", StringComparison.Ordinal) && id.Contains("/scroll", StringComparison.Ordinal) ? 22 : id.StartsWith("mchat/menu", StringComparison.Ordinal) ? (id == "mchat/menu" ? 11 : 12) : id.StartsWith("chatdialog/ignore/entry/", StringComparison.Ordinal) ? (id.EndsWith("/drag", StringComparison.Ordinal) ? 22 : 23) : id.StartsWith("chatdialog/", StringComparison.Ordinal) ? (id == "chatdialog/block" ? 20 : 21) : id.StartsWith("entry", StringComparison.Ordinal) ? 12 : id == "menu" ? 11 : id is "resize" or "split" || id.StartsWith("thumb",StringComparison.Ordinal) ? 3 : id.StartsWith("pane", StringComparison.Ordinal) ? 0 : 2;
     }
     private long _hoverStarted;
     private void Button(string id, string label, Rect r, Action action, Action? right = null, Action<double>? wheel = null)

@@ -24,9 +24,11 @@ internal sealed partial class EnbChatUi
         public bool AllChannels;
         public long Seen;
         public int Scroll;
+        /// <summary>The chat window the tab is in (an index into the windows).</summary>
+        public int Window;
     }
-    private sealed record ModernTabFile(string Name, string[]? Kinds, string[]? Channels, bool AllChannels);
-    private sealed record ModernTabsFile(ModernTabFile[] Tabs, int Active, double? DialogX = null, double? DialogY = null);
+    private sealed record ModernTabFile(string Name, string[]? Kinds, string[]? Channels, bool AllChannels, int Window = 0);
+    private sealed record ModernTabsFile(ModernTabFile[] Tabs, int Active, double? DialogX = null, double? DialogY = null, ModernWindowFile[]? Windows = null);
     /// <summary>
     /// What a chat line is, for tab filters. The server uses the retail message type mostly as a colour (its notices
     /// arrive as the green NPC type, loot as the group type, rewards as the private type), so player speech is
@@ -76,7 +78,6 @@ internal sealed partial class EnbChatUi
         ModernCheck = Pixel(90, 220, 120, 255);
     private const long ModernIdleMilliseconds = 6000, ModernFadeMilliseconds = 700;
     private readonly List<ModernTab> _modernTabs = [];
-    private int _modernTab;
     private bool _modernChat;
     private long _modernActiveAt = Environment.TickCount64;
     private int _modernFadeLevel = 10;
@@ -138,7 +139,7 @@ internal sealed partial class EnbChatUi
             foreach (var tab in _modernTabs) tab.Seen = _modernLineId;
         }
         if (_modernTabs.Count > 0 && owner == _modernTabsOwner) return;
-        _modernTabsOwner = owner; _modernTabs.Clear(); _modernTab = 0;
+        _modernTabsOwner = owner; _modernTabs.Clear(); _modernWindows.Clear();
         try
         {
             if (owner is uint character && ModernTabsPath?.Invoke(character) is { } path && EnbNext.Installation.EnbPathCase.FileExists(path) &&
@@ -147,46 +148,52 @@ internal sealed partial class EnbChatUi
                 // Tabs saved before categories and channels (no Kinds) are replaced by the defaults.
                 foreach (var saved in file.Tabs.Where(t => t.Kinds is not null))
                 {
-                    var tab = new ModernTab { Name = saved.Name.Length > 0 ? saved.Name[..Math.Min(16, saved.Name.Length)] : "Tab", AllChannels = saved.AllChannels };
+                    var tab = new ModernTab { Name = saved.Name.Length > 0 ? saved.Name[..Math.Min(16, saved.Name.Length)] : "Tab", AllChannels = saved.AllChannels,
+                        Window = Math.Clamp(saved.Window, 0, ModernMaximumWindows - 1) };
                     foreach (string kind in saved.Kinds!) if (Enum.TryParse<ModernKind>(kind, out var k) && k < ModernKind.Count) tab.Kinds[(int)k] = true;
                     if (saved.Channels is { } channels) tab.Channels.AddRange(channels);
                     _modernTabs.Add(tab);
                 }
-                if (_modernTabs.Count > 0) _modernTab = Math.Clamp(file.Active, 0, _modernTabs.Count - 1);
+                if (_modernTabs.Count > 0) LoadModernWindows(file);
                 if (file is { DialogX: { } dx, DialogY: { } dy }) _modernDialogCentre = new(Math.Clamp(dx, 0, 1), Math.Clamp(dy, 0, 1));
             }
         }
-        catch (Exception ex) when (ex is IOException or JsonException or UnauthorizedAccessException) { _modernTabs.Clear(); } // The default tabs.
+        catch (Exception ex) when (ex is IOException or JsonException or UnauthorizedAccessException) { _modernTabs.Clear(); _modernWindows.Clear(); } // The default tabs.
         if (_modernTabs.Count == 0) DefaultModernTabs();
+        NormalizeModernWindows();
         foreach (var tab in _modernTabs) tab.Seen = _modernLineId;
     }
-    /// <summary>The tabs file was replaced (the tabs are one set for all characters): read it again, keeping the tab in view.</summary>
+    /// <summary>The tabs file was replaced (the tabs are one set for all characters): read it again, windows and all.</summary>
     internal void ReloadModernTabs()
     {
         if (_modernTabs.Count == 0) return;
-        int keep = _modernTab;
-        _modernTabs.Clear(); EnsureModernTabs();
-        _modernTab = Math.Clamp(keep, 0, Math.Max(0, _modernTabs.Count - 1));
+        EndModernDrag();
+        _modernTabs.Clear(); _modernWindows.Clear(); EnsureModernTabs();
         Publish();
     }
     private void DefaultModernTabs()
     {
-        _modernTabs.Clear(); _modernTab = 0;
+        // The tabs return to the first window; the other windows close.
+        _modernTabs.Clear();
         ModernTab Tab(string name, bool channels, params ModernKind[] kinds) { var tab = new ModernTab { Name = name, AllChannels = channels }; foreach (var kind in kinds) tab.Kinds[(int)kind] = true; _modernTabs.Add(tab); return tab; }
         var general = Tab("General", true); for (int kind = 0; kind < (int)ModernKind.Count; kind++) general.Kinds[kind] = kind != (int)ModernKind.Combat;
         Tab("Social", true, ModernKind.Say, ModernKind.OutOfCharacter, ModernKind.Local, ModernKind.Broadcast, ModernKind.Private, ModernKind.Group, ModernKind.Guild);
         // Loot and rewards come from the fight, so they follow it; the category stays separate to move elsewhere.
         Tab("Combat", false, ModernKind.Combat, ModernKind.Loot);
         Tab("System", false, ModernKind.Notices, ModernKind.Tips, ModernKind.Errors, ModernKind.Warnings, ModernKind.Echo);
+        NormalizeModernWindows();
     }
     private void SaveModernTabs()
     {
         if (_modernTabsOwner is not uint character || ModernTabsPath?.Invoke(character) is not { } path) return;
         try
         {
+            NormalizeModernWindows();
             Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            int active = _modernWindows[0].Active is { } first ? Math.Max(0, _modernTabs.IndexOf(first)) : 0;
             var file = new ModernTabsFile([.. _modernTabs.Select(t => new ModernTabFile(t.Name,
-                [.. Enumerable.Range(0, (int)ModernKind.Count).Where(i => t.Kinds[i]).Select(i => ((ModernKind)i).ToString())], [.. t.Channels], t.AllChannels))], _modernTab, _modernDialogCentre?.X, _modernDialogCentre?.Y);
+                [.. Enumerable.Range(0, (int)ModernKind.Count).Where(i => t.Kinds[i]).Select(i => ((ModernKind)i).ToString())], [.. t.Channels], t.AllChannels, t.Window))],
+                active, _modernDialogCentre?.X, _modernDialogCentre?.Y, SaveModernWindows());
             File.WriteAllText(path + ".tmp", JsonSerializer.Serialize(file)); File.Move(path + ".tmp", EnbNext.Installation.EnbPathCase.Resolve(path), true);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { Error = "Could not save chat tabs: " + ex.Message; }
@@ -205,102 +212,6 @@ internal sealed partial class EnbChatUi
         int level = idle <= 0 ? 10 : (int)Math.Round(10 * Math.Max(0, 1 - idle / (double)ModernFadeMilliseconds));
         if (level == _modernFadeLevel) return false;
         _modernFadeLevel = level; return true;
-    }
-
-    private void PublishModernChat()
-    {
-        if (_menuLayer is null) return;
-        EnsureModernTabs();
-        var renderer = EnbModernText.Renderer;
-        var images = ImmutableArray.CreateBuilder<EnbUiTextDraw>();
-        var panel = ModernChatArea; _modernPublishedArea = panel;
-        float fade = _modernFadeLevel / 10f;
-        double z = ModernZoom, line = ModernLineHeight(), pad = 4 * z;
-        double tabHeight = Math.Round(line + 6 * z), inputHeight = Editing ? Math.Round(line + 8 * z) : 0;
-        var tabs = new Rect(panel.X, panel.Y, panel.Width, tabHeight);
-        var history = new Rect(panel.X, tabs.Bottom, panel.Width, panel.Height - tabHeight - inputHeight);
-        var input = new Rect(panel.X, history.Bottom, panel.Width, inputHeight);
-        _modernTab = Math.Clamp(_modernTab, 0, _modernTabs.Count - 1);
-        var active = _modernTabs[_modernTab];
-
-        // Background: a translucent dark field that fades with the tabs; the text always stays.
-        if (fade > 0) images.Add(new(ModernFill, new(history.X, history.Y, history.Width, history.Height + inputHeight)) { Opacity = .42f * fade });
-        Hit("mchat/history", history, () => { }, wheel: delta => ModernScroll(delta > 0 ? 3 : -3), group: EnbUiGroup.ModernChat);
-
-        // Tabs: the active tab joined to the field, tabs with unread lines in yellow; right click for the tab menu.
-        long newest = _modernLineId;
-        active.Seen = Math.Max(active.Seen, newest);
-        double x = tabs.X;
-        for (int i = 0; i < _modernTabs.Count; i++)
-        {
-            var tab = _modernTabs[i]; int index = i;
-            double width = Math.Ceiling(ModernMeasure(tab.Name) + 14 * z);
-            var r = new Rect(x, tabs.Y, width, tabs.Height); x = r.Right + 2 * z;
-            bool selected = i == _modernTab, hovered = _hover == "mchat/tab/" + i;
-            bool unread = !selected && ModernUnread(tab);
-            float tabOpacity = fade;
-            if (tabOpacity > 0)
-            {
-                images.Add(new(selected ? ModernFill : ModernTabFill, r) { Opacity = (selected ? .42f : .6f) * tabOpacity });
-                if (selected) images.Add(new(ModernAccent, new(r.X, r.Y, r.Width, Math.Max(1, z))) { Opacity = tabOpacity });
-                ModernText(images, tab.Name, r with { X = r.X + 7 * z, Width = r.Width - 14 * z }, unread ? new(1, .85f, .3f) : hovered || selected ? new(1, 1, 1) : new(.75f, .8f, .88f), tabOpacity);
-            }
-            Hit("mchat/tab/" + i, r, () => { _modernTab = index; _modernTabs[index].Seen = newest; SaveModernTabs(); Publish(); },
-                () => OpenModernTabMenu(index, r), group: EnbUiGroup.ModernChat);
-        }
-        var add = new Rect(x, tabs.Y, tabs.Height, tabs.Height);
-        if (fade > 0)
-        {
-            images.Add(new(ModernTabFill, add) { Opacity = .6f * fade });
-            ModernText(images, "+", add, _hover == "mchat/add" ? new(1, 1, 1) : new(.75f, .8f, .88f), fade, center: true);
-        }
-        Hit("mchat/add", add, ModernNewTab, group: EnbUiGroup.ModernChat);
-        var emote = new Rect(add.Right + 2 * z, tabs.Y, Math.Ceiling(ModernMeasure("Emote") + 14 * z), tabs.Height);
-        if (fade > 0)
-        {
-            images.Add(new(ModernTabFill, emote) { Opacity = .6f * fade });
-            ModernText(images, "Emote", emote, _hover == "mchat/emote" ? new(1, 1, 1) : new(.75f, .8f, .88f), fade, center: true);
-        }
-        Hit("mchat/emote", emote, () => OpenModernEmoteMenu(emote), group: EnbUiGroup.ModernChat);
-        ModernIncomingMessage(images, new(emote.Right + 6 * z, tabs.Y, 0, tabs.Height), z);
-
-        // History: the newest lines of the active tab at the bottom, wrapped to the field.
-        // With times on, each message starts after its time and its wrapped rows line up under its text.
-        double timeWidth = _modernTimes ? Math.Ceiling(ModernMeasure("00:00") + 6 * z) : 0;
-        // The text keeps clear of the scroll bar at the right.
-        double textWidth = history.Width - 2 * pad - Math.Round(10 * z);
-        int visibleRows = (int)Math.Max(1, (history.Height - pad) / line);
-        var rows = ModernRows(active, textWidth, visibleRows, timeWidth);
-        double y = history.Bottom - pad / 2 - rows.Count * line;
-        _modernShownRows = rows;
-        foreach (var row in rows)
-        {
-            if (row.Separator) ModernText(images, row.Text, new(history.X + pad, y, history.Width - 2 * pad, line), new(.55f, .62f, .72f), 1, center: true);
-            else
-            {
-                if (row.Time is { } time) ModernText(images, time, new(history.X + pad, y, timeWidth, line), new(.55f, .62f, .72f), 1);
-                ModernText(images, row.Text, new(history.X + pad + row.Indent, y, history.Width - 2 * pad - row.Indent, line), row.Color, 1);
-            }
-            y += line;
-        }
-        ModernChatScrollbar(images, active, history, ModernRowCount(active, textWidth, timeWidth), visibleRows, fade, z);
-
-        // The input line under the history: destination (click to cycle), then the text and caret.
-        if (Editing && !_ignoreEntry && !_privateJoinEntry && !_privatePasswordEntry)
-        {
-            images.Add(new(ModernAccent, new(input.X, input.Y, input.Width, Math.Max(1, z))) { Opacity = .8f });
-            string caption = _modernRename ? "Tab name:" : (_destination == "Channel" ? ChatChannelLabel(_target)
-                : _destination is "Secure" or "Reply" ? "To " + _target : _destination) + ":";
-            double captionWidth = Math.Ceiling(ModernMeasure(caption) + 4 * z);
-            var dest = new Rect(input.X + pad, input.Y, captionWidth, input.Height);
-            ModernText(images, caption, dest, _modernRename ? new(1, .85f, .3f) : Color(DestinationType()), 1);
-            if (!_modernRename) Hit("destination", dest, () => CycleInputDestination(false), () => CycleInputDestination(false), group: EnbUiGroup.ModernChat); // 0056F9F0: right press cycles forward too (CHAT-D29)
-            var field = new Rect(dest.Right + 2 * z, input.Y, input.Right - dest.Right - 2 * z - pad, input.Height);
-            Hit("editor", field, () => _editor.Focus(), group: EnbUiGroup.ModernChat);
-            _editor.Bounds = field;
-            ModernInput(images, field);
-        }
-        _draws.Add(new(_menuLayer, 0, panel, false) { ImagesOnly = true, LayoutGroup = EnbUiGroup.ModernChat, Images = images.ToImmutable() });
     }
 
     private byte DestinationType() => _destination switch { "Local" => 7, "Guild" => 8, "Group" => 4, "Secure" or "Reply" => 3, "Channel" => 13, _ => 2 };
@@ -337,7 +248,7 @@ internal sealed partial class EnbChatUi
         return list;
     }
 
-    private readonly record struct ModernRow(string Text, EnbRgb Color, double Indent, string? Time = null, bool Separator = false);
+    private readonly record struct ModernRow(string Text, EnbRgb Color, double Indent, string? Time = null, bool Separator = false, string? Link = null);
     private List<ModernRow> _modernShownRows = [];
     /// <summary>Probe view: the rows the panel last drew, oldest first (a time before its text, a separator between dashes).</summary>
     internal IEnumerable<string> ModernShownRows => _modernShownRows.Select(r => r.Separator ? "— " + r.Text + " —" : r.Time is { } t ? t + " " + r.Text : r.Text);
@@ -365,11 +276,12 @@ internal sealed partial class EnbChatUi
             }
             newer = source;
             var wrapped = ModernWrapped(source, width - timeWidth, timeWidth > 0);
+            string? link = ModernLinkOf(source.Line);
             for (int w = wrapped.Count - 1; w >= 0 && rows.Count < visible; w--)
             {
                 if (skip > 0) { skip--; continue; }
                 rows.Insert(0, new(wrapped[w], Color(source.Line.Type), w > 0 ? continuation : timeWidth,
-                    w == 0 && timeWidth > 0 ? source.Time.ToString("HH:mm", System.Globalization.CultureInfo.InvariantCulture) : null));
+                    w == 0 && timeWidth > 0 ? source.Time.ToString("HH:mm", System.Globalization.CultureInfo.InvariantCulture) : null, Link: link));
             }
         }
         // Scrolled past the oldest line: keep the window full.
@@ -396,9 +308,8 @@ internal sealed partial class EnbChatUi
     /// The history's scroll bar at its right edge, as the other Modern UI windows have: the thumb shows where the view is
     /// in the tab's history; drag it, or click the track for a page. Shown with the tabs, and always while scrolled back.
     /// </summary>
-    private void ModernChatScrollbar(ImmutableArray<EnbUiTextDraw>.Builder images, ModernTab tab, Rect history, int total, int visible, float fade, double z)
+    private void ModernChatScrollbar(ImmutableArray<EnbUiTextDraw>.Builder images, string Id, ModernTab tab, Rect history, int total, int visible, float fade, double z)
     {
-        const string Id = "mchat/scroll";
         float opacity = tab.Scroll > 0 || _drag == Id + "/scrollthumb" ? 1 : fade;
         if (total <= visible || opacity <= 0) { _mdScrollbars.Remove(Id); return; }
         double width = Math.Max(4, Math.Round(6 * z * _scale)) / _scale, inset = Math.Round(3 * z);
@@ -413,9 +324,9 @@ internal sealed partial class EnbChatUi
             double top = MdThumbTop(now); int page = Math.Max(1, now.Visible - 1);
             int next = _last.Y < top ? now.First - page : _last.Y > top + MdThumbHeight(now) ? now.First + page : now.First;
             now.Set(Math.Clamp(next, 0, now.Total - now.Visible));
-        }, wheel: delta => ModernScroll(delta > 0 ? 3 : -3), group: EnbUiGroup.ModernChat);
+        }, wheel: delta => ModernScroll(tab, delta > 0 ? 3 : -3), group: EnbUiGroup.ModernChat);
         Hit(Id + "/scrollthumb", new(thumb.X - inset, thumb.Y, width + inset * 2, thumb.Height), () => { },
-            wheel: delta => ModernScroll(delta > 0 ? 3 : -3), group: EnbUiGroup.ModernChat);
+            wheel: delta => ModernScroll(tab, delta > 0 ? 3 : -3), group: EnbUiGroup.ModernChat);
         bool hot = _hover == Id + "/scrollthumb" || _drag == Id + "/scrollthumb";
         int pixels = (int)Math.Round(width * _scale);
         images.Add(new(EnbModernIcons.Pill(pixels, (int)Math.Round(track.Height * _scale), new(0, 0, 0), 120), track) { Opacity = opacity });
@@ -469,19 +380,19 @@ internal sealed partial class EnbChatUi
         if (result.Count == 0) result.Add("");
         return result;
     }
-    private void ModernScroll(int lines)
+    private void ModernScroll(ModernTab tab, int lines)
     {
-        if (_modernTabs.Count == 0) return;
-        var tab = _modernTabs[_modernTab];
         tab.Scroll = Math.Max(0, tab.Scroll + lines);
         _modernActiveAt = Environment.TickCount64; Publish();
     }
 
-    private void ModernNewTab()
+    /// <summary>A new tab at the end of a window's tabs, shown at once.</summary>
+    private void ModernNewTab(int window)
     {
-        var tab = new ModernTab { Name = "Tab " + (_modernTabs.Count + 1), AllChannels = true };
+        var tab = new ModernTab { Name = "Tab " + (_modernTabs.Count + 1), AllChannels = true, Window = window };
         for (int kind = 0; kind < (int)ModernKind.Count; kind++) tab.Kinds[kind] = true;
-        _modernTabs.Add(tab); _modernTab = _modernTabs.Count - 1;
+        _modernTabs.Insert(_modernTabs.FindLastIndex(t => t.Window == window) + 1, tab);
+        if ((uint)window < (uint)_modernWindows.Count) _modernWindows[window].Active = tab;
         tab.Seen = _modernLineId;
         SaveModernTabs(); Publish();
     }
@@ -492,10 +403,9 @@ internal sealed partial class EnbChatUi
     private EnbUiPoint ModernMenuAnchor(Rect r) { var at = UiLayout?.Apply(EnbUiGroup.ModernChat, r) ?? r; return new(at.X, at.Y - 2); }
 
     // The tab menu (right click on a tab): rename, its message types and channels (tick boxes), chat settings, tabs.
-    private void OpenModernTabMenu(int index, Rect at)
+    private void OpenModernTabMenu(ModernTab tab, Rect at)
     {
-        if ((uint)index >= (uint)_modernTabs.Count) return;
-        var tab = _modernTabs[index];
+        if (!_modernTabs.Contains(tab)) return;
         ModernMenuRequested?.Invoke("mchat/tab", tab.Name, ModernTabMenu(tab), ModernMenuAnchor(at), () => ModernTabMenu(tab));
     }
     private List<EnbModernMenuItem> ModernTabMenu(ModernTab tab)
@@ -524,13 +434,17 @@ internal sealed partial class EnbChatUi
             new("Message types", Children: types),
             new("Channels", Children: channels),
             new("Chat settings", Children: ChatSettingEntries().ConvertAll(e => new EnbModernMenuItem(e.Label, e.Run))),
-            new("New tab", ModernNewTab),
+            new("New tab", () => ModernNewTab(tab.Window)),
         };
+        // Next: the chat windows (a tab can also be dragged out, onto another window or onto a tab row).
+        if (TabsOf(tab.Window).Skip(1).Any() && _modernWindows.Count < ModernMaximumWindows) items.Add(new("Move to a new window", () => SplitModernTab(tab)));
+        if (tab.Window != 0)
+            items.Add(new("Move to the first window", () => { MoveModernTab(tab, 0, null); _modernWindows[0].Active = tab; NormalizeModernWindows(); SaveModernTabs(); Publish(); }));
         if (_modernTabs.Count > 1)
             items.Add(new("Delete tab", () =>
             {
                 int i = _modernTabs.IndexOf(tab); if (i < 0) return;
-                _modernTabs.RemoveAt(i); _modernTab = Math.Clamp(_modernTab >= i && _modernTab > 0 ? _modernTab - 1 : _modernTab, 0, _modernTabs.Count - 1);
+                _modernTabs.RemoveAt(i); NormalizeModernWindows();
                 SaveModernTabs(); Publish();
             }));
         items.Add(new("Restore default tabs", () => { DefaultModernTabs(); SaveModernTabs(); Publish(); }));
